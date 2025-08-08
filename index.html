@@ -1,10 +1,11 @@
-toma y añade tu la frase en el bloque metelo aki <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portes, Mudanzas y Vaciados en Sevilla</title>
   <style>
+    /* Aquí va todo tu CSS igual que antes */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -210,6 +211,7 @@ toma y añade tu la frase en el bloque metelo aki <!DOCTYPE html>
           directionsRenderer.set('directions', null);
           document.getElementById("origen").value = "";
           document.getElementById("destino").value = "";
+          window.distanciaKm = null; // limpiar distancia
         }
       });
     }
@@ -231,8 +233,10 @@ toma y añade tu la frase en el bloque metelo aki <!DOCTYPE html>
       directionsService.route(request, (result, status) => {
         if (status === "OK") {
           directionsRenderer.setDirections(result);
-          const distancia = result.routes[0].legs[0].distance.text;
-          alert("Distancia estimada: " + distancia);
+          const distanciaTexto = result.routes[0].legs[0].distance.text;
+          const distanciaMetros = result.routes[0].legs[0].distance.value;
+          window.distanciaKm = distanciaMetros / 1000;
+          alert("Distancia estimada: " + distanciaTexto);
         }
       });
     }
@@ -261,13 +265,14 @@ toma y añade tu la frase en el bloque metelo aki <!DOCTYPE html>
       }
 
       const serviciosTexto = seleccionadas.join(', ');
-      const mensajeWhats = `Hola, soy ${nombre}.\nSolicito presupuesto para:\nServicios: ${serviciosTexto}\nDirección origen: ${origen}\nDirección destino: ${destino}\nNotas: ${notas}\nNúmero de contacto: ${telefono}`;
+      const distanciaTexto = window.distanciaKm ? `${window.distanciaKm.toFixed(2)} km` : "no calculada";
+
+      const mensajeWhats = `Hola, soy ${nombre}.\nSolicito presupuesto para:\nServicios: ${serviciosTexto}\nDirección origen: ${origen}\nDirección destino: ${destino}\nDistancia aproximada: ${distanciaTexto}\nNotas: ${notas}\nNúmero de contacto: ${telefono}`;
 
       const numeroTuWhats = '34698373471';
       const urlWhats = `https://wa.me/${numeroTuWhats}?text=${encodeURIComponent(mensajeWhats)}`;
       window.open(urlWhats, '_blank');
 
-      // Envío a Formspree
       fetch('https://formspree.io/f/mwpqwvlr', {
         method: 'POST',
         headers: {
@@ -280,6 +285,7 @@ toma y añade tu la frase en el bloque metelo aki <!DOCTYPE html>
           servicios: serviciosTexto,
           origen,
           destino,
+          distancia_km: window.distanciaKm ? window.distanciaKm.toFixed(2) : "",
           notas
         })
       })
