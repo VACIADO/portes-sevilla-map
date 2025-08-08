@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Portes, Mudanzas y Vaciados en Sevilla</title>
   <style>
+    /* ... el resto del CSS queda igual ... */
     html, body {
       margin: 0; padding: 0; overflow-x: hidden; /* Evitar scroll horizontal en móvil */
       font-family: Arial, sans-serif;
@@ -121,7 +122,6 @@
     .aviso span {
       color: green;
     }
-
     /* Modal */
     #modal {
       display: none;
@@ -264,19 +264,16 @@
 
       map.addListener("click", (e) => {
         if (clickState === 0) {
-          // Marca origen
           originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
           geocodePosition(e.latLng, "origen");
           clickState = 1;
           document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
         } else if (clickState === 1) {
-          // Marca destino
           destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
           geocodePosition(e.latLng, "destino");
           clickState = 2;
           calcularRuta();
         } else {
-          // Tercer click limpia todo
           if (originMarker) originMarker.setMap(null);
           if (destinationMarker) destinationMarker.setMap(null);
           originMarker = null;
@@ -326,10 +323,7 @@
       });
     }
 
-    function validarTelefono(tel) {
-      const regex = /^[6789]\d{8}$/;
-      return regex.test(tel);
-    }
+    // Función validarTelefono eliminada porque no validamos el número
 
     function enviarSolicitud() {
       const nombre = document.getElementById('nombre').value.trim();
@@ -343,10 +337,7 @@
         return;
       }
 
-      if (!validarTelefono(telefono)) {
-        alert('Número de teléfono no válido. Debe tener 9 dígitos y empezar por 6,7,8 o 9.');
-        return;
-      }
+      // Ya no se valida el formato del teléfono
 
       const opciones = document.querySelectorAll('.option');
       let seleccionadas = [];
@@ -386,7 +377,6 @@
       })
       .then(response => {
         if (response.ok) {
-          // Muestra modal en vez de texto
           mostrarModal();
           document.getElementById('resultado').textContent = '';
         } else {
