@@ -2,18 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Portes, Mudanzas y Vaciados en Sevilla</title>
   <style>
-    /* Aquí va todo tu CSS igual que antes */
-    body {
+    html, body {
+      margin: 0; padding: 0; overflow-x: hidden; /* Evitar scroll horizontal en móvil */
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
     }
     .container {
       max-width: 800px;
+      width: 95%;
       margin: auto;
       background-color: white;
       padding: 20px;
@@ -97,7 +101,14 @@
       height: 350px;
       width: 100%;
       border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    #map-instruction {
+      font-size: 16px;
+      color: #555;
+      text-align: center;
       margin-bottom: 20px;
+      min-height: 24px;
     }
   </style>
 </head>
@@ -136,6 +147,7 @@
 
     <h2>📍 Marca tu ruta en el mapa</h2>
     <div id="map"></div>
+    <p id="map-instruction">Toca una vez para marcar el <strong>origen</strong>.</p>
 
     <h2>💬 Calcula tu presupuesto</h2>
     <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -160,7 +172,7 @@
       <input type="text" id="destino" placeholder="Marca en el mapa" readonly />
 
       <label for="notas">Notas adicionales:</label>
-      <textarea id="notas" placeholder="Ej: Es una mudanza con cajas, sofá y nevera. Hay ascensor."></textarea>
+      <textarea id="notas" placeholder="Ej: Es una mudanza con cajas, sofá y nevera. Hay ascensor. ℹ️ Si hay objetos de valor, el vaciado puede salir gratis a cambio del contenido"></textarea>
 
       <button onclick="enviarSolicitud()">Solicitar Presupuesto</button>
 
@@ -183,6 +195,7 @@
 
   <script>
     let map, originMarker, destinationMarker, directionsService, directionsRenderer, geocoder;
+    let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -195,23 +208,33 @@
       directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
       directionsRenderer.setMap(map);
 
+      document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+
       map.addListener("click", (e) => {
-        if (!originMarker) {
+        if (clickState === 0) {
+          // Marca origen
           originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
           geocodePosition(e.latLng, "origen");
-        } else if (!destinationMarker) {
+          clickState = 1;
+          document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
+        } else if (clickState === 1) {
+          // Marca destino
           destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
           geocodePosition(e.latLng, "destino");
+          clickState = 2;
           calcularRuta();
         } else {
-          originMarker.setMap(null);
-          destinationMarker.setMap(null);
+          // Tercer click limpia todo
+          if (originMarker) originMarker.setMap(null);
+          if (destinationMarker) destinationMarker.setMap(null);
           originMarker = null;
           destinationMarker = null;
           directionsRenderer.set('directions', null);
           document.getElementById("origen").value = "";
           document.getElementById("destino").value = "";
-          window.distanciaKm = null; // limpiar distancia
+          document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+          window.distanciaKm = null;
+          clickState = 0;
         }
       });
     }
@@ -220,11 +243,15 @@
       geocoder.geocode({ location: latlng }, (results, status) => {
         if (status === "OK" && results[0]) {
           document.getElementById(inputId).value = results[0].formatted_address;
+        } else {
+          document.getElementById(inputId).value = "Dirección no encontrada";
         }
       });
     }
 
     function calcularRuta() {
+      if (!originMarker || !destinationMarker) return;
+
       const request = {
         origin: originMarker.getPosition(),
         destination: destinationMarker.getPosition(),
@@ -233,10 +260,16 @@
       directionsService.route(request, (result, status) => {
         if (status === "OK") {
           directionsRenderer.setDirections(result);
-          const distanciaTexto = result.routes[0].legs[0].distance.text;
-          const distanciaMetros = result.routes[0].legs[0].distance.value;
+
+          const leg = result.routes[0].legs[0];
+          const distanciaTexto = leg.distance.text;
+          const distanciaMetros = leg.distance.value;
           window.distanciaKm = distanciaMetros / 1000;
-          alert("Distancia estimada: " + distanciaTexto);
+
+          document.getElementById("map-instruction").textContent = 
+            `Destino marcado. Distancia estimada: ${distanciaTexto}. Toca otra vez para reiniciar.`;
+        } else {
+          document.getElementById("map-instruction").textContent = "No se pudo calcular la ruta. Toca para reiniciar.";
         }
       });
     }
