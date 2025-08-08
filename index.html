@@ -75,6 +75,7 @@
       font-size: 16px;
       width: 100%;
       transition: background-color 0.3s ease;
+      margin-bottom: 20px;
     }
     button:hover {
       background-color: #0056b3;
@@ -119,6 +120,35 @@
     }
     .aviso span {
       color: green;
+    }
+
+    /* Modal */
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #modal > div {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 300px;
+      text-align: center;
+    }
+    #modal button {
+      padding: 8px 16px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: auto;
     }
   </style>
 </head>
@@ -207,6 +237,14 @@
     </div>
   </div>
 
+  <!-- Modal confirmación -->
+  <div id="modal">
+    <div>
+      <p>✅ Solicitud enviada correctamente. Revisa tu WhatsApp.</p>
+      <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
   <script>
     let map, originMarker, destinationMarker, directionsService, directionsRenderer, geocoder;
     let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
@@ -288,6 +326,11 @@
       });
     }
 
+    function validarTelefono(tel) {
+      const regex = /^[6789]\d{8}$/;
+      return regex.test(tel);
+    }
+
     function enviarSolicitud() {
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
@@ -297,6 +340,11 @@
 
       if (!nombre || !telefono) {
         alert('Por favor, introduce nombre y teléfono.');
+        return;
+      }
+
+      if (!validarTelefono(telefono)) {
+        alert('Número de teléfono no válido. Debe tener 9 dígitos y empezar por 6,7,8 o 9.');
         return;
       }
 
@@ -338,7 +386,9 @@
       })
       .then(response => {
         if (response.ok) {
-          document.getElementById('resultado').textContent = '✅ Solicitud enviada. Revisa WhatsApp.';
+          // Muestra modal en vez de texto
+          mostrarModal();
+          document.getElementById('resultado').textContent = '';
         } else {
           document.getElementById('resultado').textContent = '❌ Falló el envío del correo, pero se abrió WhatsApp.';
         }
@@ -347,6 +397,13 @@
         console.error('Error:', error);
         document.getElementById('resultado').textContent = '❌ Error al enviar. Intenta de nuevo.';
       });
+    }
+
+    function mostrarModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function cerrarModal() {
+      document.getElementById('modal').style.display = 'none';
     }
   </script>
 
