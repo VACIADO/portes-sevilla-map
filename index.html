@@ -246,7 +246,7 @@
   </div>
 
   <script>
-    let map, originMarker, destinationMarker, directionsService, directionsRenderer, geocoder;
+    let map, originMarker, destinationMarker, geocoder;
     let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 
     function initMap() {
@@ -256,29 +256,28 @@
       });
 
       geocoder = new google.maps.Geocoder();
-      directionsService = new google.maps.DirectionsService();
-      directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
-      directionsRenderer.setMap(map);
 
       document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
       map.addListener("click", (e) => {
         if (clickState === 0) {
+          if (originMarker) originMarker.setMap(null);
           originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
           geocodePosition(e.latLng, "origen");
           clickState = 1;
           document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
         } else if (clickState === 1) {
+          if (destinationMarker) destinationMarker.setMap(null);
           destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
           geocodePosition(e.latLng, "destino");
           clickState = 2;
-          calcularRuta();
+          // No se calcula ruta ni distancia
+          document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
         } else {
           if (originMarker) originMarker.setMap(null);
           if (destinationMarker) destinationMarker.setMap(null);
           originMarker = null;
           destinationMarker = null;
-          directionsRenderer.set('directions', null);
           document.getElementById("origen").value = "";
           document.getElementById("destino").value = "";
           document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
@@ -298,33 +297,6 @@
       });
     }
 
-    function calcularRuta() {
-      if (!originMarker || !destinationMarker) return;
-
-      const request = {
-        origin: originMarker.getPosition(),
-        destination: destinationMarker.getPosition(),
-        travelMode: google.maps.TravelMode.DRIVING,
-      };
-      directionsService.route(request, (result, status) => {
-        if (status === "OK") {
-          directionsRenderer.setDirections(result);
-
-          const leg = result.routes[0].legs[0];
-          const distanciaTexto = leg.distance.text;
-          const distanciaMetros = leg.distance.value;
-          window.distanciaKm = distanciaMetros / 1000;
-
-          document.getElementById("map-instruction").textContent = 
-            `Destino marcado. Distancia estimada: ${distanciaTexto}. Toca otra vez para reiniciar.`;
-        } else {
-          document.getElementById("map-instruction").textContent = "No se pudo calcular la ruta. Toca para reiniciar.";
-        }
-      });
-    }
-
-    // Función validarTelefono eliminada porque no validamos el número
-
     function enviarSolicitud() {
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
@@ -336,8 +308,6 @@
         alert('Por favor, introduce nombre y teléfono.');
         return;
       }
-
-      // Ya no se valida el formato del teléfono
 
       const opciones = document.querySelectorAll('.option');
       let seleccionadas = [];
