@@ -403,6 +403,42 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// NUEVA FUNCIÓN AÑADIDA PARA ENVIAR LA SOLICITUD POR WHATSAPP
+function enviarSolicitud() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const telefono = document.getElementById('telefono').value.trim();
+  const origen = document.getElementById('origen').value.trim();
+  const destino = document.getElementById('destino').value.trim();
+  const notas = document.getElementById('notas').value.trim();
+
+  const armarios = document.getElementById('armarios').value;
+  const cajas = document.getElementById('cajas').value;
+  const bultos = document.getElementById('bultos').value;
+  const otros = document.getElementById('otros-objetos').value.trim();
+
+  const precio = document.getElementById('precioTotal').textContent;
+
+  if (!nombre || !telefono || !origen || !destino) {
+    alert("Por favor, completa los campos: nombre, teléfono, origen y destino.");
+    return;
+  }
+
+  let mensaje = `Presupuesto pedido por ${nombre}%0A`;
+  mensaje += `Teléfono: ${telefono}%0A`;
+  mensaje += `Origen: ${origen}%0ADestino: ${destino}%0A`;
+  mensaje += `Objetos:%0A- Armarios: ${armarios}%0A- Cajas: ${cajas}%0A- Bultos: ${bultos}%0A- Otros: ${otros || 'Ninguno'}%0A`;
+  mensaje += `Notas adicionales: ${notas || 'Ninguna'}%0A`;
+  mensaje += `${precio}%0A%0AGracias por confiar en nosotros.`;
+
+  const numeroWhatsApp = '34698373471';
+  const urlWhatsapp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
+
+  window.open(urlWhatsapp, '_blank');
+
+  // Opcional: limpiar formulario o mostrar modal aquí si quieres
+}
+
+
 </script>
 
 
@@ -422,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </body>
 </html>
+
 
 
 
