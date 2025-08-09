@@ -263,29 +263,31 @@
         }
       });
     }
+function calcularDistancia() {
+  if (!originMarker || !destinationMarker) {
+    window.distanciaKm = 0;
+    actualizarPrecio();
+    return;
+  }
 
-    function calcularDistancia() {
-      if (!originMarker || !destinationMarker) {
-        window.distanciaKm = 0;
-        actualizarPrecio();
-        return;
-      }
+  const request = {
+    origin: originMarker.getPosition(),
+    destination: destinationMarker.getPosition(),
+    travelMode: google.maps.TravelMode.DRIVING,
+  };
 
-      const request = {
-        origin: originMarker.getPosition(),
-        destination: destinationMarker.getPosition(),
-        travelMode: google.maps.TravelMode.DRIVING,
-      };
-
-      directionsService.route(request, (result, status) => {
-        if (status === "OK") {
-          const ruta = result.routes[0];
-          const distanciaMetros = ruta.legs[0].distance.value;
-          window.distanciaKm = distanciaMetros / 1000;
-          actualizarPrecio();
-        } else {
-          window.distanciaKm = 0;
-          actualizarPrecio();
+  directionsService.route(request, (result, status) => {
+    if (status === "OK") {
+      const ruta = result.routes[0];
+      const distanciaMetros = ruta.legs[0].distance.value;
+      window.distanciaKm = distanciaMetros / 1000;
+      console.log("Distancia calculada:", window.distanciaKm, "km");
+      actualizarPrecio();
+    } else {
+      console.warn("Error al calcular ruta:", status);
+      window.distanciaKm = 0;
+      actualizarPrecio();
+    
         }
       });
     }
@@ -399,5 +401,6 @@
   </div>
 </body>
 </html>
+
 
 
