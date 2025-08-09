@@ -142,21 +142,21 @@
       <li>✅ Pintura de pisos, naves y trasteros</li>
     </ul>
 
-    <h2>💰 Tarifas orientativas</h2>
-    <table>
-      <thead>
-        <tr><th>Servicio</th><th>Precio desde</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Porte local (sólo transporte)</td><td>30 €</td></tr>
-        <tr><td>Porte + carga y descarga</td><td>60 €</td></tr>
-        <tr><td>Mudanza pequeña en Sevilla</td><td>90 €</td></tr>
-        <tr><td>Vaciado de piso 60–90 m²</td><td>150 €</td></tr>
-        <tr><td>Vaciado de nave</td><td>180 €</td></tr>
-        <tr><td>Limpieza post-vaciado</td><td>50 €</td></tr>
-        <tr><td>Pintura de piso, trastero o nave</td><td>100 €</td></tr>
-      </tbody>
-    </table>
+  <h2>💰 Tarifas orientativas</h2>
+<table>
+  <thead>
+    <tr><th>Servicio</th><th>Precio desde</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Porte local (solo transporte)</td><td>30 €</td></tr>
+    <tr><td>Porte + carga y descarga</td><td>60 €</td></tr>
+    <tr><td>Mudanza pequeña en Sevilla</td><td>90 €</td></tr>
+    <tr><td>Vaciado de piso 60–90 m²</td><td>150 €</td></tr>
+    <tr><td>Vaciado de nave</td><td>180 €</td></tr>
+    <tr><td>Limpieza post-vaciado</td><td>Precio según tamaño y condiciones</td></tr>
+    <tr><td>Pintura de piso, trastero o nave</td><td>Precio según tamaño y necesidades</td></tr>
+  </tbody>
+</table>
 
     <h2>📍 Marca tu ruta en el mapa</h2>
     <div id="map"></div>
@@ -170,13 +170,14 @@
       <label for="telefono">Número WhatsApp:</label>
       <input type="tel" id="telefono" placeholder="Ej: tu número" />
 
-      <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)" data-price="30"> Porte local (solo transporte)</label>
-      <label><input type="checkbox" class="option" data-name="Carga y descarga" data-price="30"> Carga y descarga</label>
-      <label><input type="checkbox" class="option" data-name="Mudanza en Sevilla" data-price="60"> Mudanza en Sevilla</label>
-      <label><input type="checkbox" class="option" data-name="Vaciado piso mediano" data-price="90"> Vaciado piso mediano</label>
-      <label><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="120"> Vaciado de nave</label>
-      <label><input type="checkbox" class="option" data-name="Limpieza post-vaciado" data-price="50"> Limpieza post-vaciado</label>
-      <label><input type="checkbox" class="option" data-name="Pintura de piso/trastero/nave" data-price="100"> Pintura de piso/trastero/nave</label><br><br>
+    <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)" data-price="30"> Porte local (solo transporte)</label>
+<label><input type="checkbox" class="option" data-name="Porte + carga y descarga" data-price="60"> Porte + carga y descarga</label>
+<label><input type="checkbox" class="option" data-name="Mudanza pequeña en Sevilla" data-price="90"> Mudanza pequeña en Sevilla</label>
+<label><input type="checkbox" class="option" data-name="Vaciado de piso 60–90 m²" data-price="150"> Vaciado de piso 60–90 m²</label>
+<label><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
+<label><input type="checkbox" class="option" data-name="Limpieza post-vaciado (precio según tamaño y condiciones)" data-price="0"> Limpieza post-vaciado</label>
+<label><input type="checkbox" class="option" data-name="Pintura de piso, trastero o nave (precio según tamaño y necesidades)" data-price="0"> Pintura de piso, trastero o nave</label>
+<br><br>
 
       <label for="origen">Dirección origen:</label>
       <input type="text" id="origen" placeholder="Marca en el mapa o escribe aquí" />
@@ -401,6 +402,7 @@ function calcularDistancia() {
   </div>
 </body>
 </html>
+
 
 
 
