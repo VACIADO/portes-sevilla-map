@@ -209,184 +209,200 @@
     </div>
   </div>
 
-  <script>
-    let map, originMarker, destinationMarker, geocoder, directionsService;
-    let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
-    window.distanciaKm = 0;
+<script>
+  let map, originMarker, destinationMarker, geocoder, directionsService;
+  let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
+  window.distanciaKm = 0;
 
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 37.3826, lng: -5.9963 },
-        zoom: 11,
-      });
+  function initMap() {
+    const sevillaCenter = { lat: 37.3826, lng: -5.9963 };
 
-      geocoder = new google.maps.Geocoder();
-      directionsService = new google.maps.DirectionsService();
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: sevillaCenter,
+      zoom: 11,
+    });
 
-      document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+    geocoder = new google.maps.Geocoder();
+    directionsService = new google.maps.DirectionsService();
 
-      map.addListener("click", (e) => {
-        if (clickState === 0) {
-          if (originMarker) originMarker.setMap(null);
-          originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
-          geocodePosition(e.latLng, "origen");
-          clickState = 1;
-          document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
-        } else if (clickState === 1) {
-          if (destinationMarker) destinationMarker.setMap(null);
-          destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
-          geocodePosition(e.latLng, "destino");
-          clickState = 2;
-          calcularDistancia();
-          document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
-        } else {
-          if (originMarker) originMarker.setMap(null);
-          if (destinationMarker) destinationMarker.setMap(null);
-          originMarker = null;
-          destinationMarker = null;
-          document.getElementById("origen").value = "";
-          document.getElementById("destino").value = "";
-          document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
-          window.distanciaKm = 0;
-          actualizarPrecio();
-          clickState = 0;
-        }
+    // Círculo que delimita Sevilla
+    const sevillaCircle = new google.maps.Circle({
+      strokeColor: '#007BFF',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#007BFF',
+      fillOpacity: 0.15,
+      map: map,
+      center: sevillaCenter,
+      radius: 15000, // 15 km en metros
+    });
+
+    document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+
+    map.addListener("click", (e) => {
+      if (clickState === 0) {
+        if (originMarker) originMarker.setMap(null);
+        originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
+        geocodePosition(e.latLng, "origen");
+        clickState = 1;
+        document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
+      } else if (clickState === 1) {
+        if (destinationMarker) destinationMarker.setMap(null);
+        destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
+        geocodePosition(e.latLng, "destino");
+        clickState = 2;
+        calcularDistancia();
+        document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
+      } else {
+        if (originMarker) originMarker.setMap(null);
+        if (destinationMarker) destinationMarker.setMap(null);
+        originMarker = null;
+        destinationMarker = null;
+        document.getElementById("origen").value = "";
+        document.getElementById("destino").value = "";
+        document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+        window.distanciaKm = 0;
         actualizarPrecio();
-      });
-    }
-
-    function geocodePosition(latlng, inputId) {
-      geocoder.geocode({ location: latlng }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          document.getElementById(inputId).value = results[0].formatted_address;
-        } else {
-          document.getElementById(inputId).value = "Dirección no encontrada";
-        }
-      });
-    }
-function calcularDistancia() {
-  if (!originMarker || !destinationMarker) {
-    window.distanciaKm = 0;
-    actualizarPrecio();
-    return;
+        clickState = 0;
+      }
+      actualizarPrecio();
+    });
   }
 
-  const request = {
-    origin: originMarker.getPosition(),
-    destination: destinationMarker.getPosition(),
-    travelMode: google.maps.TravelMode.DRIVING,
-  };
+  function geocodePosition(latlng, inputId) {
+    geocoder.geocode({ location: latlng }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        document.getElementById(inputId).value = results[0].formatted_address;
+      } else {
+        document.getElementById(inputId).value = "Dirección no encontrada";
+      }
+    });
+  }
 
-  directionsService.route(request, (result, status) => {
-    if (status === "OK") {
-      const ruta = result.routes[0];
-      const distanciaMetros = ruta.legs[0].distance.value;
-      window.distanciaKm = distanciaMetros / 1000;
-      console.log("Distancia calculada:", window.distanciaKm, "km");
-      actualizarPrecio();
-    } else {
-      console.warn("Error al calcular ruta:", status);
+  function calcularDistancia() {
+    if (!originMarker || !destinationMarker) {
       window.distanciaKm = 0;
       actualizarPrecio();
-    
-        }
-      });
+      return;
     }
 
-    function actualizarPrecio() {
-      const opciones = document.querySelectorAll('.option');
-      let total = 0;
+    const request = {
+      origin: originMarker.getPosition(),
+      destination: destinationMarker.getPosition(),
+      travelMode: google.maps.TravelMode.DRIVING,
+    };
 
-      opciones.forEach(op => {
-        if (op.checked) {
-          const precio = parseFloat(op.dataset.price) || 0;
-          total += precio;
-        }
-      });
-
-      const precioKm = 1.2; // €/km
-      if (window.distanciaKm && window.distanciaKm > 0) {
-        total += window.distanciaKm * precioKm;
+    directionsService.route(request, (result, status) => {
+      if (status === "OK") {
+        const ruta = result.routes[0];
+        const distanciaMetros = ruta.legs[0].distance.value;
+        window.distanciaKm = distanciaMetros / 1000;
+        console.log("Distancia calculada:", window.distanciaKm, "km");
+        actualizarPrecio();
+      } else {
+        console.warn("Error al calcular ruta:", status);
+        window.distanciaKm = 0;
+        actualizarPrecio();
       }
-
-      document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const opciones = document.querySelectorAll('.option');
-      opciones.forEach(op => {
-        op.addEventListener('change', actualizarPrecio);
-      });
     });
-    function enviarSolicitud() {
-      const nombre = document.getElementById('nombre').value.trim();
-      const telefono = document.getElementById('telefono').value.trim();
-      const origen = document.getElementById('origen').value.trim();
-      const destino = document.getElementById('destino').value.trim();
-      const notas = document.getElementById('notas').value.trim();
+  }
 
-      if (!nombre || !telefono) {
-        alert('Por favor, introduce nombre y teléfono.');
-        return;
+  function actualizarPrecio() {
+    const opciones = document.querySelectorAll('.option');
+    let total = 0;
+
+    opciones.forEach(op => {
+      if (op.checked) {
+        const precio = parseFloat(op.dataset.price) || 0;
+        total += precio;
       }
+    });
 
-      const opciones = document.querySelectorAll('.option');
-      let seleccionadas = [];
-      opciones.forEach(op => {
-        if (op.checked) seleccionadas.push(op.dataset.name);
-      });
+    const precioKm = 1.2; // €/km
+    if (window.distanciaKm && window.distanciaKm > 0) {
+      total += window.distanciaKm * precioKm;
+    }
 
-      if (seleccionadas.length === 0) {
-        alert('Por favor, selecciona al menos un servicio.');
-        return;
+    document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const opciones = document.querySelectorAll('.option');
+    opciones.forEach(op => {
+      op.addEventListener('change', actualizarPrecio);
+    });
+  });
+
+  function enviarSolicitud() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const origen = document.getElementById('origen').value.trim();
+    const destino = document.getElementById('destino').value.trim();
+    const notas = document.getElementById('notas').value.trim();
+
+    if (!nombre || !telefono) {
+      alert('Por favor, introduce nombre y teléfono.');
+      return;
+    }
+
+    const opciones = document.querySelectorAll('.option');
+    let seleccionadas = [];
+    opciones.forEach(op => {
+      if (op.checked) seleccionadas.push(op.dataset.name);
+    });
+
+    if (seleccionadas.length === 0) {
+      alert('Por favor, selecciona al menos un servicio.');
+      return;
+    }
+
+    const serviciosTexto = seleccionadas.join(', ');
+    const distanciaTexto = window.distanciaKm ? `${window.distanciaKm.toFixed(2)} km` : "no calculada";
+
+    const mensajeWhats = `Hola, soy ${nombre}.\nSolicito presupuesto para:\nServicios: ${serviciosTexto}\nDirección origen: ${origen}\nDirección destino: ${destino}\nDistancia aproximada: ${distanciaTexto}\nNotas: ${notas}\nNúmero de contacto: ${telefono}`;
+
+    const numeroTuWhats = '34698373471';
+    const urlWhats = `https://wa.me/${numeroTuWhats}?text=${encodeURIComponent(mensajeWhats)}`;
+    window.open(urlWhats, '_blank');
+
+    fetch('https://formspree.io/f/mwpqwvlr', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        servicios: serviciosTexto,
+        origen,
+        destino,
+        distancia_km: window.distanciaKm ? window.distanciaKm.toFixed(2) : "",
+        notas
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        mostrarModal();
+        document.getElementById('resultado').textContent = '';
+      } else {
+        document.getElementById('resultado').textContent = '❌ Falló el envío del correo, pero se abrió WhatsApp.';
       }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      document.getElementById('resultado').textContent = '❌ Error al enviar. Intenta de nuevo.';
+    });
+  }
 
-      const serviciosTexto = seleccionadas.join(', ');
-      const distanciaTexto = window.distanciaKm ? `${window.distanciaKm.toFixed(2)} km` : "no calculada";
+  function mostrarModal() {
+    document.getElementById('modal').style.display = 'flex';
+  }
+  function cerrarModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+</script>
 
-      const mensajeWhats = `Hola, soy ${nombre}.\nSolicito presupuesto para:\nServicios: ${serviciosTexto}\nDirección origen: ${origen}\nDirección destino: ${destino}\nDistancia aproximada: ${distanciaTexto}\nNotas: ${notas}\nNúmero de contacto: ${telefono}`;
-
-      const numeroTuWhats = '34698373471';
-      const urlWhats = `https://wa.me/${numeroTuWhats}?text=${encodeURIComponent(mensajeWhats)}`;
-      window.open(urlWhats, '_blank');
-
-      fetch('https://formspree.io/f/mwpqwvlr', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          nombre,
-          telefono,
-          servicios: serviciosTexto,
-          origen,
-          destino,
-          distancia_km: window.distanciaKm ? window.distanciaKm.toFixed(2) : "",
-          notas
-        })
-      })
-      .then(response => {
-        if (response.ok) {
-          mostrarModal();
-          document.getElementById('resultado').textContent = '';
-        } else {
-          document.getElementById('resultado').textContent = '❌ Falló el envío del correo, pero se abrió WhatsApp.';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('resultado').textContent = '❌ Error al enviar. Intenta de nuevo.';
-      });
-    }
-
-    function mostrarModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
-    function cerrarModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-  </script>
 
   <!-- Google Maps API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&callback=initMap" async defer></script>
@@ -402,6 +418,7 @@ function calcularDistancia() {
   </div>
 </body>
 </html>
+
 
 
 
