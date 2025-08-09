@@ -238,22 +238,24 @@ function initMap() {
     clickable: false,
   });
 
+  // Definir polígono 'store' con coordenadas reales (ajustar según zona)
+  const storeCoords = [
+    { lat: 37.405, lng: -6.015 },
+    { lat: 37.405, lng: -5.95 },
+    { lat: 37.355, lng: -5.95 },
+    { lat: 37.355, lng: -6.015 }
+  ];
+  const storePolygon = new google.maps.Polygon({ paths: storeCoords });
+
   document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
   map.addListener("click", (e) => {
-    // Permitir marcar dentro y fuera del círculo pero avisar si fuera
-    const distanciaAlCentro = google.maps.geometry.spherical.computeDistanceBetween(e.latLng, sevillaCircle.getCenter());
-    
     if (clickState === 0) {
       if (originMarker) originMarker.setMap(null);
       originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
       geocodePosition(e.latLng, "origen");
       clickState = 1;
       document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
-
-      if (distanciaAlCentro > sevillaCircle.getRadius()) {
-        alert("Has marcado el origen fuera de Sevilla capital. Se aplicará un precio extra por km fuera del área.");
-      }
     } else if (clickState === 1) {
       if (destinationMarker) destinationMarker.setMap(null);
       destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
@@ -261,10 +263,6 @@ function initMap() {
       clickState = 2;
       calcularDistancia();
       document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
-
-      if (distanciaAlCentro > sevillaCircle.getRadius()) {
-        alert("Has marcado el destino fuera de Sevilla capital. Se aplicará un precio extra por km fuera del área.");
-      }
     } else {
       if (originMarker) originMarker.setMap(null);
       if (destinationMarker) destinationMarker.setMap(null);
@@ -279,98 +277,107 @@ function initMap() {
     }
     actualizarPrecio();
   });
-}
 
-function geocodePosition(latlng, inputId) {
-  geocoder.geocode({ location: latlng }, (results, status) => {
-    if (status === "OK" && results[0]) {
-      document.getElementById(inputId).value = results[0].formatted_address;
-    } else {
-      document.getElementById(inputId).value = "Dirección no encontrada";
-    }
-  });
-}
-
-function calcularDistancia() {
-  if (!originMarker || !destinationMarker) {
-    window.distanciaKm = 0;
-    actualizarPrecio();
-    return;
+  function geocodePosition(latlng, inputId) {
+    geocoder.geocode({ location: latlng }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        document.getElementById(inputId).value = results[0].formatted_address;
+      } else {
+        document.getElementById(inputId).value = "Dirección no encontrada";
+      }
+    });
   }
 
-  const request = {
-    origin: originMarker.getPosition(),
-    destination: destinationMarker.getPosition(),
-    travelMode: google.maps.TravelMode.DRIVING,
-  };
-
-  directionsService.route(request, (result, status) => {
-    if (status === "OK") {
-      const ruta = result.routes[0];
-      const distanciaMetros = ruta.legs[0].distance.value;
-      window.distanciaKm = distanciaMetros / 1000;
-      console.log("Distancia calculada:", window.distanciaKm, "km");
-      actualizarPrecio();
-    } else {
-      console.warn("Error al calcular ruta:", status);
+  function calcularDistancia() {
+    if (!originMarker || !destinationMarker) {
       window.distanciaKm = 0;
       actualizarPrecio();
+      return;
     }
-  });
+
+    const request = {
+      origin: originMarker.getPosition(),
+      destination: destinationMarker.getPosition(),
+      travelMode: google.maps.TravelMode.DRIVING,
+    };
+
+    directionsService.route(request, (result, status) => {
+      if (status === "OK") {
+        const ruta = result.routes[0];
+        const distanciaMetros = ruta.legs[0].distance.value;
+        window.distanciaKm = distanciaMetros / 1000;
+        console.log("Distancia calculada:", window.distanciaKm, "km");
+        actualizarPrecio();
+      } else {
+        console.warn("Error al calcular ruta:", status);
+        window.distanciaKm = 0;
+        actualizarPrecio();
+      }
+    });
+  }
+
+  function actualizarPrecio() {
+    const opciones = document.querySelectorAll('.option');
+    let total = 0;
+
+    opciones.forEach(op => {
+      if (op.checked) {
+        const precio = parseFloat(op.dataset.price) || 0;
+        total += precio;
+      }
+    });
+
+    const precioKm = 1.2; // €/km
+    const sevillaCenterLatLng = new google.maps.LatLng(37.3826, -5.9963);
+    const sevillaRadius = 7000; // 7 km en metros
+
+    let extraKm = 0;
+    let extraCost = 0;
+
+    if (originMarker) {
+      const distOriginToCenter = google.maps.geometry.spherical.computeDistanceBetween(originMarker.getPosition(), sevillaCenterLatLng);
+      if (distOriginToCenter > sevillaRadius) {
+        extraKm += (distOriginToCenter - sevillaRadius) / 1000;
+      }
+      if (!google.maps.geometry.poly.containsLocation(originMarker.getPosition(), storePolygon)) {
+        extraCost += 15; // coste fijo si origen fuera del polígono 'store'
+      }
+    }
+
+    if (destinationMarker) {
+      const distDestToCenter = google.maps.geometry.spherical.computeDistanceBetween(destinationMarker.getPosition(), sevillaCenterLatLng);
+      if (distDestToCenter > sevillaRadius) {
+        extraKm += (distDestToCenter - sevillaRadius) / 1000;
+      }
+    }
+
+    if (window.distanciaKm && window.distanciaKm > 0) {
+      total += window.distanciaKm * precioKm;
+    }
+
+    if (extraKm > 0) {
+      const precioExtraKm = 2.0;
+      total += extraKm * precioExtraKm;
+    }
+
+    total += extraCost;
+
+    document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
+  }
+
+  // Exponer actualizarPrecio para el listener externo
+  window.actualizarPrecio = actualizarPrecio;
 }
 
-function actualizarPrecio() {
-  const opciones = document.querySelectorAll('.option');
-  let total = 0;
-
-  opciones.forEach(op => {
-    if (op.checked) {
-      const precio = parseFloat(op.dataset.price) || 0;
-      total += precio;
-    }
-  });
-
-  const precioKm = 1.2; // €/km
-  const sevillaCenter = new google.maps.LatLng(37.3826, -5.9963);
-  const sevillaRadius = 7000; // 7 km en metros
-
-  // Calcular kilómetros fuera del círculo para origen y destino
-  let extraKm = 0;
-
-  if (originMarker) {
-    const distOrigin = google.maps.geometry.spherical.computeDistanceBetween(originMarker.getPosition(), sevillaCenter);
-    if (distOrigin > sevillaRadius) {
-      extraKm += (distOrigin - sevillaRadius) / 1000; // en km
-    }
-  }
-  if (destinationMarker) {
-    const distDest = google.maps.geometry.spherical.computeDistanceBetween(destinationMarker.getPosition(), sevillaCenter);
-    if (distDest > sevillaRadius) {
-      extraKm += (distDest - sevillaRadius) / 1000; // en km
-    }
-  }
-
-  // Precio base por km de la ruta calculada
-  if (window.distanciaKm && window.distanciaKm > 0) {
-    total += window.distanciaKm * precioKm;
-  }
-
-  // Añadir precio extra por km fuera del círculo
-  if (extraKm > 0) {
-    const precioExtraKm = 2.0; // €/km extra fuera del área (puedes cambiar el valor)
-    total += extraKm * precioExtraKm;
-  }
-
-  document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
-}
-
+// Añadir listener para opciones checkbox fuera de initMap
 document.addEventListener('DOMContentLoaded', () => {
   const opciones = document.querySelectorAll('.option');
   opciones.forEach(op => {
-    op.addEventListener('change', actualizarPrecio);
+    op.addEventListener('change', () => {
+      if (window.actualizarPrecio) window.actualizarPrecio();
+    });
   });
 });
-
 
 </script>
 
@@ -391,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </body>
 </html>
+
 
 
 
