@@ -272,9 +272,6 @@ function initMap() {
   ];
   const storePolygon = new google.maps.Polygon({ paths: storeCoords });
 
-  // resto del código igual...
-}
-
   document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
   map.addListener("click", (e) => {
@@ -457,6 +454,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
