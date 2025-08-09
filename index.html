@@ -2,32 +2,27 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portes, Mudanzas y Vaciados en Sevilla</title>
   <style>
-    /* ... el resto del CSS queda igual ... */
     html, body {
-      margin: 0; padding: 0; overflow-x: hidden; /* Evitar scroll horizontal en móvil */
+      margin: 0; padding: 0; overflow-x: hidden;
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       width: 100%;
       box-sizing: border-box;
     }
-    *, *:before, *:after {
-      box-sizing: inherit;
-    }
+    *, *:before, *:after { box-sizing: inherit; }
     .container {
       max-width: 800px;
       width: 95%;
       margin: auto;
-      background-color: white;
+      background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1, h2 {
-      text-align: center;
-    }
+    h1, h2 { text-align: center; }
     ul {
       font-size: 16px;
       line-height: 1.6;
@@ -50,7 +45,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 15px;
-      box-sizing: border-box;
     }
     label {
       display: flex;
@@ -78,9 +72,7 @@
       transition: background-color 0.3s ease;
       margin-bottom: 20px;
     }
-    button:hover {
-      background-color: #0056b3;
-    }
+    button:hover { background-color: #0056b3; }
     .whatsapp-button {
       background-color: #25D366;
       color: white;
@@ -98,6 +90,13 @@
       color: green;
       margin-top: 10px;
       text-align: center;
+    }
+    #precioTotal {
+      font-size: 20px;
+      font-weight: bold;
+      color: #007BFF;
+      text-align: center;
+      margin-bottom: 20px;
     }
     #map {
       height: 350px;
@@ -119,37 +118,7 @@
       text-align: center;
       margin-bottom: 15px;
     }
-    .aviso span {
-      color: green;
-    }
-    /* Modal */
-    #modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #modal > div {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 300px;
-      text-align: center;
-    }
-    #modal button {
-      padding: 8px 16px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-      width: auto;
-    }
+    .aviso span { color: green; }
   </style>
 </head>
 <body>
@@ -179,13 +148,13 @@
         <tr><th>Servicio</th><th>Precio desde</th></tr>
       </thead>
       <tbody>
-        <tr><td>Porte local (sólo transporte)</td><td>—</td></tr>
-        <tr><td>Porte + carga y descarga</td><td>—</td></tr>
-        <tr><td>Mudanza pequeña en Sevilla</td><td>—</td></tr>
-        <tr><td>Vaciado de piso 60–90 m²</td><td>—</td></tr>
-        <tr><td>Vaciado de nave</td><td>—</td></tr>
-        <tr><td>Limpieza post-vaciado</td><td>—</td></tr>
-        <tr><td>Pintura de piso, trastero o nave</td><td>—</td></tr>
+        <tr><td>Porte local (sólo transporte)</td><td>30 €</td></tr>
+        <tr><td>Porte + carga y descarga</td><td>60 €</td></tr>
+        <tr><td>Mudanza pequeña en Sevilla</td><td>90 €</td></tr>
+        <tr><td>Vaciado de piso 60–90 m²</td><td>150 €</td></tr>
+        <tr><td>Vaciado de nave</td><td>180 €</td></tr>
+        <tr><td>Limpieza post-vaciado</td><td>50 €</td></tr>
+        <tr><td>Pintura de piso, trastero o nave</td><td>100 €</td></tr>
       </tbody>
     </table>
 
@@ -201,13 +170,13 @@
       <label for="telefono">Número WhatsApp:</label>
       <input type="tel" id="telefono" placeholder="Ej: tu número" />
 
-      <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)"> Porte local (solo transporte)</label>
-      <label><input type="checkbox" class="option" data-name="Carga y descarga"> Carga y descarga</label>
-      <label><input type="checkbox" class="option" data-name="Mudanza en Sevilla"> Mudanza en Sevilla</label>
-      <label><input type="checkbox" class="option" data-name="Vaciado piso mediano"> Vaciado piso mediano</label>
-      <label><input type="checkbox" class="option" data-name="Vaciado de nave"> Vaciado de nave</label>
-      <label><input type="checkbox" class="option" data-name="Limpieza post-vaciado"> Limpieza post-vaciado</label>
-      <label><input type="checkbox" class="option" data-name="Pintura de piso/trastero/nave"> Pintura de piso/trastero/nave</label><br><br>
+      <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)" data-price="30"> Porte local (solo transporte)</label>
+      <label><input type="checkbox" class="option" data-name="Carga y descarga" data-price="30"> Carga y descarga</label>
+      <label><input type="checkbox" class="option" data-name="Mudanza en Sevilla" data-price="60"> Mudanza en Sevilla</label>
+      <label><input type="checkbox" class="option" data-name="Vaciado piso mediano" data-price="90"> Vaciado piso mediano</label>
+      <label><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="120"> Vaciado de nave</label>
+      <label><input type="checkbox" class="option" data-name="Limpieza post-vaciado" data-price="50"> Limpieza post-vaciado</label>
+      <label><input type="checkbox" class="option" data-name="Pintura de piso/trastero/nave" data-price="100"> Pintura de piso/trastero/nave</label><br><br>
 
       <label for="origen">Dirección origen:</label>
       <input type="text" id="origen" placeholder="Marca en el mapa o escribe aquí" />
@@ -217,6 +186,8 @@
 
       <label for="notas">Notas adicionales:</label>
       <textarea id="notas" placeholder="Ej: Es una mudanza con cajas, sofá y nevera. Hay ascensor. ℹ️ Si hay objetos de valor, el vaciado puede salir gratis a cambio del contenido"></textarea>
+
+      <div id="precioTotal">Precio estimado: 0 €</div>
 
       <button onclick="enviarSolicitud()">Solicitar Presupuesto</button>
 
@@ -237,17 +208,10 @@
     </div>
   </div>
 
-  <!-- Modal confirmación -->
-  <div id="modal">
-    <div>
-      <p>✅ Solicitud enviada correctamente. Revisa tu WhatsApp.</p>
-      <button onclick="cerrarModal()">Cerrar</button>
-    </div>
-  </div>
-
   <script>
-    let map, originMarker, destinationMarker, geocoder;
+    let map, originMarker, destinationMarker, geocoder, directionsService;
     let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
+    window.distanciaKm = 0;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -256,6 +220,7 @@
       });
 
       geocoder = new google.maps.Geocoder();
+      directionsService = new google.maps.DirectionsService();
 
       document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
@@ -271,7 +236,7 @@
           destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
           geocodePosition(e.latLng, "destino");
           clickState = 2;
-          // No se calcula ruta ni distancia
+          calcularDistancia();
           document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
         } else {
           if (originMarker) originMarker.setMap(null);
@@ -281,9 +246,11 @@
           document.getElementById("origen").value = "";
           document.getElementById("destino").value = "";
           document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
-          window.distanciaKm = null;
+          window.distanciaKm = 0;
+          actualizarPrecio();
           clickState = 0;
         }
+        actualizarPrecio();
       });
     }
 
@@ -297,6 +264,57 @@
       });
     }
 
+    function calcularDistancia() {
+      if (!originMarker || !destinationMarker) {
+        window.distanciaKm = 0;
+        actualizarPrecio();
+        return;
+      }
+
+      const request = {
+        origin: originMarker.getPosition(),
+        destination: destinationMarker.getPosition(),
+        travelMode: google.maps.TravelMode.DRIVING,
+      };
+
+      directionsService.route(request, (result, status) => {
+        if (status === "OK") {
+          const ruta = result.routes[0];
+          const distanciaMetros = ruta.legs[0].distance.value;
+          window.distanciaKm = distanciaMetros / 1000;
+          actualizarPrecio();
+        } else {
+          window.distanciaKm = 0;
+          actualizarPrecio();
+        }
+      });
+    }
+
+    function actualizarPrecio() {
+      const opciones = document.querySelectorAll('.option');
+      let total = 0;
+
+      opciones.forEach(op => {
+        if (op.checked) {
+          const precio = parseFloat(op.dataset.price) || 0;
+          total += precio;
+        }
+      });
+
+      const precioKm = 1.2; // €/km
+      if (window.distanciaKm && window.distanciaKm > 0) {
+        total += window.distanciaKm * precioKm;
+      }
+
+      document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const opciones = document.querySelectorAll('.option');
+      opciones.forEach(op => {
+        op.addEventListener('change', actualizarPrecio);
+      });
+    });
     function enviarSolicitud() {
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
@@ -369,5 +387,13 @@
 
   <!-- Google Maps API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&callback=initMap" async defer></script>
+
+  <!-- Modal confirmación -->
+  <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; display:flex;">
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
+      <p>✅ Solicitud enviada correctamente. Revisa tu WhatsApp.</p>
+      <button onclick="cerrarModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-top:10px;">Cerrar</button>
+    </div>
+  </div>
 </body>
 </html>
