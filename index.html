@@ -178,6 +178,30 @@
 <label><input type="checkbox" class="option" data-name="Limpieza post-vaciado (precio según tamaño y condiciones)" data-price="0"> Limpieza post-vaciado</label>
 <label><input type="checkbox" class="option" data-name="Pintura de piso, trastero o nave (precio según tamaño y necesidades)" data-price="0"> Pintura de piso, trastero o nave</label>
 <br><br>
+      <h3>📦 Selecciona objetos para tu mudanza/porte</h3>
+<div id="objetos-lista">
+  <div>
+    <label>Armarios:
+      <input type="number" id="armarios" min="0" value="0" style="width:60px; margin-left:5px;">
+    </label>
+  </div>
+  <div>
+    <label>Cajas:
+      <input type="number" id="cajas" min="0" value="0" style="width:60px; margin-left:5px;">
+    </label>
+  </div>
+  <div>
+    <label>Bultos:
+      <input type="number" id="bultos" min="0" value="0" style="width:60px; margin-left:5px;">
+    </label>
+  </div>
+  <div>
+    <label>Otros objetos:
+      <input type="text" id="otros-objetos" placeholder="Especifica aquí..." style="margin-left:5px; width:200px;">
+    </label>
+  </div>
+</div>
+
 
       <label for="origen">Dirección origen:</label>
       <input type="text" id="origen" placeholder="Marca en el mapa o escribe aquí" />
@@ -398,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </body>
 </html>
+
 
 
 
