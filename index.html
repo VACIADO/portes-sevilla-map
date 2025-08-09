@@ -239,18 +239,17 @@ let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 window.distanciaKm = 0;
 
 function initMap() {
-  // Nuevo centro más hacia el este para cubrir Sevilla Este, Torre Blanca y Pinomontano
-  const sevillaCenter = { lat: 37.39, lng: -5.95 };
+  const sevillaCenter = { lat: 37.3826, lng: -5.9963 };
 
   map = new google.maps.Map(document.getElementById("map"), {
     center: sevillaCenter,
-    zoom: 13,  // un poco más cerca para dar mejor cobertura a esas zonas
+    zoom: 12,
   });
 
   geocoder = new google.maps.Geocoder();
   directionsService = new google.maps.DirectionsService();
 
-  // Círculo Sevilla Capital (5 km) centrado en la nueva posición
+  // Círculo Sevilla Capital reducido a 5 km
   const sevillaCircle = new google.maps.Circle({
     strokeColor: '#007BFF',
     strokeOpacity: 0.8,
@@ -259,16 +258,16 @@ function initMap() {
     fillOpacity: 0.15,
     map: map,
     center: sevillaCenter,
-    radius: 5000,
+    radius: 5000, // 5 km para ciudad capital
     clickable: false,
   });
 
-  // Polígono 'store' ajustado para incluir Sevilla Este, Torre Blanca y Pinomontano
+  // Polígono 'store' (ajusta según tu zona)
   const storeCoords = [
-    { lat: 37.41, lng: -5.975 },
-    { lat: 37.41, lng: -5.92 },
-    { lat: 37.36, lng: -5.92 },
-    { lat: 37.36, lng: -5.975 }
+    { lat: 37.405, lng: -6.015 },
+    { lat: 37.405, lng: -5.95 },
+    { lat: 37.355, lng: -5.95 },
+    { lat: 37.355, lng: -6.015 }
   ];
   const storePolygon = new google.maps.Polygon({ paths: storeCoords });
 
@@ -454,6 +453,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
