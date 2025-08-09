@@ -227,15 +227,16 @@
 
     // Círculo que delimita Sevilla
     const sevillaCircle = new google.maps.Circle({
-      strokeColor: '#007BFF',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#007BFF',
-      fillOpacity: 0.15,
-      map: map,
-      center: sevillaCenter,
-      radius: 15000, // 15 km en metros
-    });
+  strokeColor: '#007BFF',
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  fillColor: '#007BFF',
+  fillOpacity: 0.15,
+  map: map,
+  center: sevillaCenter,
+  radius: 7000, // 7 km en metros, para cubrir solo la ciudad capital
+  clickable: false // para que no bloquee los clics en el mapa
+});
 
     document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
@@ -418,6 +419,7 @@
   </div>
 </body>
 </html>
+
 
 
 
