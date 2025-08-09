@@ -219,28 +219,34 @@
 
     map = new google.maps.Map(document.getElementById("map"), {
       center: sevillaCenter,
-      zoom: 11,
+      zoom: 12, // zoom un poco más cercano a la ciudad
     });
 
     geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
 
-    // Círculo que delimita Sevilla
+    // Círculo que delimita Sevilla capital
     const sevillaCircle = new google.maps.Circle({
-  strokeColor: '#007BFF',
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: '#007BFF',
-  fillOpacity: 0.15,
-  map: map,
-  center: sevillaCenter,
-  radius: 7000, // 7 km en metros, para cubrir solo la ciudad capital
-  clickable: false // para que no bloquee los clics en el mapa
-});
+      strokeColor: '#007BFF',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#007BFF',
+      fillOpacity: 0.15,
+      map: map,
+      center: sevillaCenter,
+      radius: 7000, // 7 km en metros para ciudad capital
+      clickable: false // para que no bloquee clics en el mapa
+    });
 
     document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
 
     map.addListener("click", (e) => {
+      // Si quisieras limitar a marcar solo dentro del círculo, aquí podrías hacer:
+      // if (google.maps.geometry.spherical.computeDistanceBetween(e.latLng, sevillaCircle.getCenter()) > sevillaCircle.getRadius()) {
+      //   alert("Por favor, marca dentro de Sevilla capital.");
+      //   return;
+      // }
+
       if (clickState === 0) {
         if (originMarker) originMarker.setMap(null);
         originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
@@ -405,6 +411,7 @@
 </script>
 
 
+
   <!-- Google Maps API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&callback=initMap" async defer></script>
 
@@ -419,6 +426,7 @@
   </div>
 </body>
 </html>
+
 
 
 
