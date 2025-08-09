@@ -249,7 +249,7 @@ function initMap() {
   geocoder = new google.maps.Geocoder();
   directionsService = new google.maps.DirectionsService();
 
-  // Círculo Sevilla Capital
+  // Círculo Sevilla Capital reducido a 5 km
   const sevillaCircle = new google.maps.Circle({
     strokeColor: '#007BFF',
     strokeOpacity: 0.8,
@@ -258,11 +258,11 @@ function initMap() {
     fillOpacity: 0.15,
     map: map,
     center: sevillaCenter,
-    radius: 7000, // 7 km para ciudad capital
+    radius: 5000, // 5 km para ciudad capital
     clickable: false,
   });
 
-  // Definir polígono 'store' con coordenadas reales (ajustar según zona)
+  // Polígono 'store' (ajusta según tu zona)
   const storeCoords = [
     { lat: 37.405, lng: -6.015 },
     { lat: 37.405, lng: -5.95 },
@@ -353,7 +353,7 @@ function initMap() {
 
     const precioKm = 1.2; // €/km
     const sevillaCenterLatLng = new google.maps.LatLng(37.3826, -5.9963);
-    const sevillaRadius = 7000; // 7 km en metros
+    const sevillaRadius = 5000; // 5 km en metros
 
     let extraKm = 0;
     let extraCost = 0;
@@ -393,7 +393,6 @@ function initMap() {
   window.actualizarPrecio = actualizarPrecio;
 }
 
-// Añadir listener para opciones checkbox fuera de initMap
 document.addEventListener('DOMContentLoaded', () => {
   const opciones = document.querySelectorAll('.option');
   opciones.forEach(op => {
@@ -403,7 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// NUEVA FUNCIÓN AÑADIDA PARA ENVIAR LA SOLICITUD POR WHATSAPP
 function enviarSolicitud() {
   const nombre = document.getElementById('nombre').value.trim();
   const telefono = document.getElementById('telefono').value.trim();
@@ -435,10 +433,6 @@ function enviarSolicitud() {
 
   window.open(urlWhatsapp, '_blank');
 
-  // Opcional: limpiar formulario o mostrar modal aquí si quieres
-}
-
-
 </script>
 
 
@@ -458,6 +452,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
