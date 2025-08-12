@@ -239,24 +239,29 @@ let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 window.distanciaKm = 0;
 
 function initMap() {
-  const sevillaCenter = { lat: 37.395, lng: -5.985 };
 
-map = new google.maps.Map(document.getElementById("map"), {
-  center: sevillaCenter,
-  zoom: 12,
-});
+const sevillaCenter = { lat: 37.3826, lng: -5.9963 };
 
-const sevillaCircle = new google.maps.Circle({
-  strokeColor: '#007BFF',
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: '#007BFF',
-  fillOpacity: 0.15,
-  map: map,
-  center: sevillaCenter,
-  radius: 6000, // 6 km
-  clickable: false,
-});
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: sevillaCenter,
+    zoom: 12,
+  });
+
+  geocoder = new google.maps.Geocoder();
+  directionsService = new google.maps.DirectionsService();
+
+  // Círculo Sevilla Capital reducido a 5 km
+  const sevillaCircle = new google.maps.Circle({
+    strokeColor: '#007BFF',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#007BFF',
+    fillOpacity: 0.15,
+    map: map,
+    center: sevillaCenter,
+    radius: 5000, // 5 km para ciudad capital
+    clickable: false,
+  });
 
 
   // Polígono 'store' (ajusta según tu zona)
@@ -450,6 +455,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
