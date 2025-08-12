@@ -239,14 +239,13 @@ let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 window.distanciaKm = 0;
 
 function initMap() {
-  const sevillaCenter = { lat: 37.4186, lng: -5.9731 };
+  const sevillaCenter = { lat: 37.395, lng: -5.985 };
 
 map = new google.maps.Map(document.getElementById("map"), {
   center: sevillaCenter,
   zoom: 12,
 });
 
-// Círculo Sevilla Este, Torre Blanca y Pino Montano
 const sevillaCircle = new google.maps.Circle({
   strokeColor: '#007BFF',
   strokeOpacity: 0.8,
@@ -255,9 +254,10 @@ const sevillaCircle = new google.maps.Circle({
   fillOpacity: 0.15,
   map: map,
   center: sevillaCenter,
-  radius: 4000, // 4 km para Sevilla Este, Torre Blanca y Pino Montano
+  radius: 6000, // 6 km
   clickable: false,
 });
+
 
   // Polígono 'store' (ajusta según tu zona)
   const storeCoords = [
@@ -450,6 +450,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
