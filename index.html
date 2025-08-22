@@ -234,12 +234,12 @@
   </div>
 
 <script>
-let map, originMarker, destinationMarker, geocoder, directionsService;
+let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer;
 let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 window.distanciaKm = 0;
 
 function initMap() {
-  const sevillaCenter = { lat: 37.3980, lng: -5.9650 }; // Centro movido N-NE para mayor cobertura
+  const sevillaCenter = { lat: 37.3980, lng: -5.9650 };
 
   map = new google.maps.Map(document.getElementById("map"), {
     center: sevillaCenter,
@@ -248,8 +248,8 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
-  // Círculo Sevilla Capital ampliado para cubrir Sevilla Este, Torreblanca y Pino Montano
   const sevillaCircle = new google.maps.Circle({
     strokeColor: '#007BFF',
     strokeOpacity: 0.8,
@@ -258,11 +258,10 @@ function initMap() {
     fillOpacity: 0.15,
     map: map,
     center: sevillaCenter,
-    radius: 6500, // 6.5 km
+    radius: 6500,
     clickable: false,
   });
 
-  // Polígono 'store' (ajusta según tu zona)
   const storeCoords = [
     { lat: 37.405, lng: -6.015 },
     { lat: 37.405, lng: -5.95 },
@@ -292,6 +291,7 @@ function initMap() {
       if (destinationMarker) destinationMarker.setMap(null);
       originMarker = null;
       destinationMarker = null;
+      directionsRenderer.setDirections({ routes: [] }); // limpiar ruta
       document.getElementById("origen").value = "";
       document.getElementById("destino").value = "";
       document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
@@ -306,8 +306,6 @@ function initMap() {
     geocoder.geocode({ location: latlng }, (results, status) => {
       if (status === "OK" && results[0]) {
         document.getElementById(inputId).value = results[0].formatted_address;
-      } else {
-        document.getElementById(inputId).value = "Dirección no encontrada";
       }
     });
   }
@@ -327,13 +325,12 @@ function initMap() {
 
     directionsService.route(request, (result, status) => {
       if (status === "OK") {
+        directionsRenderer.setDirections(result); // dibujar ruta
         const ruta = result.routes[0];
         const distanciaMetros = ruta.legs[0].distance.value;
         window.distanciaKm = distanciaMetros / 1000;
-        console.log("Distancia calculada:", window.distanciaKm, "km");
         actualizarPrecio();
       } else {
-        console.warn("Error al calcular ruta:", status);
         window.distanciaKm = 0;
         actualizarPrecio();
       }
@@ -351,9 +348,9 @@ function initMap() {
       }
     });
 
-    const precioKm = 1.2; // €/km
+    const precioKm = 1.2;
     const sevillaCenterLatLng = new google.maps.LatLng(37.3980, -5.9650);
-    const sevillaRadius = 6500; // 6.5 km en metros
+    const sevillaRadius = 6500;
 
     let extraKm = 0;
     let extraCost = 0;
@@ -364,7 +361,7 @@ function initMap() {
         extraKm += (distOriginToCenter - sevillaRadius) / 1000;
       }
       if (!google.maps.geometry.poly.containsLocation(originMarker.getPosition(), storePolygon)) {
-        extraCost += 15; // coste fijo si origen fuera del polígono 'store'
+        extraCost += 15;
       }
     }
 
@@ -389,8 +386,29 @@ function initMap() {
     document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
   }
 
-  // Exponer actualizarPrecio para el listener externo
   window.actualizarPrecio = actualizarPrecio;
+
+  // Escuchar cambios en los inputs de texto y actualizar mapa
+  document.getElementById("origen").addEventListener("change", () => geocodeAddress("origen"));
+  document.getElementById("destino").addEventListener("change", () => geocodeAddress("destino"));
+
+  function geocodeAddress(inputId) {
+    const address = document.getElementById(inputId).value;
+    if (!address) return;
+    geocoder.geocode({ address: address }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        if (inputId === "origen") {
+          if (originMarker) originMarker.setMap(null);
+          originMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "A" });
+        } else {
+          if (destinationMarker) destinationMarker.setMap(null);
+          destinationMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "B" });
+        }
+        map.setCenter(results[0].geometry.location);
+        if (originMarker && destinationMarker) calcularDistancia();
+      }
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -433,15 +451,11 @@ function enviarSolicitud() {
 
   window.open(urlWhatsapp, '_blank');
 }
+</script>
 
- // <-- Cierre de la función
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 
-</script> <!-- Cierre del bloque script -->
-
-
-
-  <!-- Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 
 
  <!-- Modal confirmación -->
@@ -455,6 +469,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
