@@ -232,119 +232,131 @@
       <a href="https://wa.me/34698373471" target="_blank" class="whatsapp-button">💬 Escríbenos por WhatsApp</a>
     </div>
   </div>
-
 <script>
-  // Inicializamos el mapa y el servicio de direcciones
-let map, directionsService, directionsRenderer, geocoder;
+let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer;
+let clickState = 0; // 0: esperando origen, 1: esperando destino
+window.distanciaKm = 0;
 
 function initMap() {
+  const sevillaCenter = { lat: 37.3980, lng: -5.9650 };
+
   map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 7,
-    center: { lat: 37.3891, lng: -5.9845 }, // Sevilla
+    center: sevillaCenter,
+    zoom: 12,
   });
 
-  directionsService = new google.maps.DirectionsService();
-  directionsRenderer = new google.maps.DirectionsRenderer();
-  directionsRenderer.setMap(map);
-
   geocoder = new google.maps.Geocoder();
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
-  // Cuando el usuario cambia texto en origen/destino → recalcula ruta
-  document.getElementById("origen").addEventListener("blur", actualizarRuta);
-  document.getElementById("destino").addEventListener("blur", actualizarRuta);
+  document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+
+  // Click en mapa → poner origen/destino
+  map.addListener("click", (e) => {
+    if (clickState === 0) {
+      if (originMarker) originMarker.setMap(null);
+      originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
+      geocodePosition(e.latLng, "origen");
+      clickState = 1;
+      document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
+    } else if (clickState === 1) {
+      if (destinationMarker) destinationMarker.setMap(null);
+      destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
+      geocodePosition(e.latLng, "destino");
+      clickState = 2;
+      calcularRuta();
+      document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
+    } else {
+      // Reset
+      if (originMarker) originMarker.setMap(null);
+      if (destinationMarker) destinationMarker.setMap(null);
+      originMarker = null;
+      destinationMarker = null;
+      document.getElementById("origen").value = "";
+      document.getElementById("destino").value = "";
+      document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+      window.distanciaKm = 0;
+      actualizarPrecio();
+      directionsRenderer.set("directions", null);
+      clickState = 0;
+    }
+    actualizarPrecio();
+  });
+
+  // Si escriben dirección a mano → actualizar mapa
+  document.getElementById("origen").addEventListener("blur", () => geocodeAddress("origen"));
+  document.getElementById("destino").addEventListener("blur", () => geocodeAddress("destino"));
 }
 
-// Función para actualizar ruta en el mapa
-function actualizarRuta() {
-  const origen = document.getElementById("origen").value.trim();
-  const destino = document.getElementById("destino").value.trim();
+function geocodePosition(latlng, inputId) {
+  geocoder.geocode({ location: latlng }, (results, status) => {
+    if (status === "OK" && results[0]) {
+      document.getElementById(inputId).value = results[0].formatted_address;
+      calcularRuta();
+    }
+  });
+}
 
-  if (origen && destino) {
-    directionsService.route(
-      {
-        origin: origen,
-        destination: destino,
-        travelMode: google.maps.TravelMode.DRIVING,
-      },
-      (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-          directionsRenderer.setDirections(response);
+function geocodeAddress(inputId) {
+  const address = document.getElementById(inputId).value.trim();
+  if (!address) return;
 
-          // Calculamos kilómetros reales
-          let km = 0;
-          const route = response.routes[0].legs[0];
-          km = route.distance.value / 1000; // metros → km
-
-          document.getElementById("km").value = km.toFixed(1);
-        } else {
-          alert("No se pudo calcular la ruta: " + status);
-        }
+  geocoder.geocode({ address: address }, (results, status) => {
+    if (status === "OK" && results[0]) {
+      const pos = results[0].geometry.location;
+      if (inputId === "origen") {
+        if (originMarker) originMarker.setMap(null);
+        originMarker = new google.maps.Marker({ position: pos, map: map, label: "A" });
+      } else {
+        if (destinationMarker) destinationMarker.setMap(null);
+        destinationMarker = new google.maps.Marker({ position: pos, map: map, label: "B" });
       }
-    );
-  }
+      map.setCenter(pos);
+      calcularRuta();
+    }
+  });
 }
 
-// Enviar solicitud con cálculo de precio
-function enviarSolicitud() {
-  const nombre = document.getElementById("nombre").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-  const origen = document.getElementById("origen").value.trim();
-  const destino = document.getElementById("destino").value.trim();
-  const km = parseFloat(document.getElementById("km").value) || 0;
-  const notas = document.getElementById("notas") ? document.getElementById("notas").value.trim() : "";
+function calcularRuta() {
+  if (!originMarker || !destinationMarker) return;
 
-  if (!nombre) { alert("Por favor, introduce tu nombre."); return; }
-  if (!telefono) { alert("Por favor, introduce tu número de WhatsApp."); return; }
-  if (!origen || !destino) { alert("Por favor, introduce ambas direcciones."); return; }
+  const request = {
+    origin: originMarker.getPosition(),
+    destination: destinationMarker.getPosition(),
+    travelMode: google.maps.TravelMode.DRIVING,
+  };
 
-  const opciones = document.querySelectorAll(".option");
-  let seleccionadas = [];
-  let total = 25; // 🚨 Base más baja para no asustar
+  directionsService.route(request, (result, status) => {
+    if (status === "OK") {
+      directionsRenderer.setDirections(result);
+      const distanciaMetros = result.routes[0].legs[0].distance.value;
+      window.distanciaKm = distanciaMetros / 1000;
+      actualizarPrecio();
+    }
+  });
+}
+
+function actualizarPrecio() {
+  const opciones = document.querySelectorAll('.option');
+  let total = 25; // base más baja
 
   opciones.forEach(op => {
     if (op.checked) {
-      const precio = parseFloat(op.dataset.price);
-      const nombreServicio = op.dataset.name;
-      seleccionadas.push(`${nombreServicio}`);
-      total += precio;
+      total += parseFloat(op.dataset.price) || 0;
     }
   });
 
-  // 🚨 Ajuste de precio: km moderados (0.5 €/km)
-  total += km * 0.5;
+  // km suaves
+  total += window.distanciaKm * 0.7;
 
-  const mensaje = `
-Hola, soy ${nombre}.
-Solicito presupuesto para:
-Servicios: ${seleccionadas.join(", ")}
-Kilómetros estimados: ${km.toFixed(1)} km
-Dirección origen: ${origen}
-Dirección destino: ${destino}
-Notas: ${notas}
-Número para contacto: ${telefono}
-`;
-
-  const numeroTuWhats = "34698373471";
-  const urlWhats = `https://wa.me/${numeroTuWhats}?text=${encodeURIComponent(mensaje)}`;
-  window.open(urlWhats, "_blank");
-
-  document.getElementById("resultado").textContent =
-    "Se ha abierto WhatsApp con tu solicitud. Gracias por contactarnos.";
+  document.getElementById("precioTotal").textContent = `Precio estimado: ${total.toFixed(2)} €`;
 }
 </script>
 
-<!-- Google Maps API con tu clave -->
 <script async
-  src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&libraries=places&callback=initMap">
+  src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&libraries=geometry&callback=initMap">
+</script>
 
- // <-- Cierre de la función
-
-</script> <!-- Cierre del bloque script -->
-
-
-
-  <!-- Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 
 
  <!-- Modal confirmación -->
@@ -358,6 +370,7 @@ Número para contacto: ${telefono}
   </div>
 </body>
 </html>
+
 
 
 
