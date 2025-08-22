@@ -232,10 +232,8 @@
       <a href="https://wa.me/34698373471" target="_blank" class="whatsapp-button">💬 Escríbenos por WhatsApp</a>
     </div>
   </div>
-
 <script>
 let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer;
-let clickState = 0; // 0: sin marcar, 1: origen, 2: destino
 window.distanciaKm = 0;
 
 function initMap() {
@@ -270,34 +268,28 @@ function initMap() {
   ];
   const storePolygon = new google.maps.Polygon({ paths: storeCoords });
 
-  document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
+  document.getElementById("map-instruction").textContent = "Toca en el mapa o escribe direcciones para marcar origen y destino.";
 
+  // --- CLICK EN EL MAPA ---
   map.addListener("click", (e) => {
-    if (clickState === 0) {
-      if (originMarker) originMarker.setMap(null);
+    if (!originMarker) {
       originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
       geocodePosition(e.latLng, "origen");
-      clickState = 1;
-      document.getElementById("map-instruction").textContent = "Toca otra vez para marcar el destino.";
-    } else if (clickState === 1) {
-      if (destinationMarker) destinationMarker.setMap(null);
+    } else if (!destinationMarker) {
       destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
       geocodePosition(e.latLng, "destino");
-      clickState = 2;
       calcularDistancia();
-      document.getElementById("map-instruction").textContent = "Origen y destino marcados. Toca otra vez para reiniciar.";
     } else {
-      if (originMarker) originMarker.setMap(null);
-      if (destinationMarker) destinationMarker.setMap(null);
+      // reset
+      originMarker.setMap(null);
+      destinationMarker.setMap(null);
       originMarker = null;
       destinationMarker = null;
-      directionsRenderer.setDirections({ routes: [] }); // limpiar ruta
+      directionsRenderer.setDirections({ routes: [] });
       document.getElementById("origen").value = "";
       document.getElementById("destino").value = "";
-      document.getElementById("map-instruction").textContent = "Toca una vez para marcar el origen.";
       window.distanciaKm = 0;
       actualizarPrecio();
-      clickState = 0;
     }
     actualizarPrecio();
   });
@@ -325,7 +317,7 @@ function initMap() {
 
     directionsService.route(request, (result, status) => {
       if (status === "OK") {
-        directionsRenderer.setDirections(result); // dibujar ruta
+        directionsRenderer.setDirections(result);
         const ruta = result.routes[0];
         const distanciaMetros = ruta.legs[0].distance.value;
         window.distanciaKm = distanciaMetros / 1000;
@@ -354,10 +346,12 @@ function initMap() {
 
     let extraKm = 0;
     let extraCost = 0;
+    let dentroSevilla = true;
 
     if (originMarker) {
       const distOriginToCenter = google.maps.geometry.spherical.computeDistanceBetween(originMarker.getPosition(), sevillaCenterLatLng);
       if (distOriginToCenter > sevillaRadius) {
+        dentroSevilla = false;
         extraKm += (distOriginToCenter - sevillaRadius) / 1000;
       }
       if (!google.maps.geometry.poly.containsLocation(originMarker.getPosition(), storePolygon)) {
@@ -368,6 +362,7 @@ function initMap() {
     if (destinationMarker) {
       const distDestToCenter = google.maps.geometry.spherical.computeDistanceBetween(destinationMarker.getPosition(), sevillaCenterLatLng);
       if (distDestToCenter > sevillaRadius) {
+        dentroSevilla = false;
         extraKm += (distDestToCenter - sevillaRadius) / 1000;
       }
     }
@@ -383,12 +378,17 @@ function initMap() {
 
     total += extraCost;
 
+    // 🔴 Mínimo 35 € dentro del círculo de Sevilla
+    if (dentroSevilla && total < 35) {
+      total = 35;
+    }
+
     document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
   }
 
   window.actualizarPrecio = actualizarPrecio;
 
-  // Escuchar cambios en los inputs de texto y actualizar mapa
+  // --- DIRECCIONES ESCRITAS ---
   document.getElementById("origen").addEventListener("change", () => geocodeAddress("origen"));
   document.getElementById("destino").addEventListener("change", () => geocodeAddress("destino"));
 
@@ -458,6 +458,7 @@ function enviarSolicitud() {
 
 
 
+
  <!-- Modal confirmación -->
 <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
   <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
@@ -469,6 +470,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
