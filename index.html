@@ -340,6 +340,37 @@ function initMap() {
       }
     });
 
+    // --- Cálculo peso automático ---
+    const armarios = parseInt(document.getElementById("armarios").value) || 0;
+    const cajas = parseInt(document.getElementById("cajas").value) || 0;
+    const bultos = parseInt(document.getElementById("bultos").value) || 0;
+    const sofas = parseInt(document.getElementById("sofas").value) || 0;
+    const mesas = parseInt(document.getElementById("mesas").value) || 0;
+    const sillas = parseInt(document.getElementById("sillas").value) || 0;
+    const camaMatrimonio = parseInt(document.getElementById("camaMatrimonio").value) || 0;
+    const camaIndividual = parseInt(document.getElementById("camaIndividual").value) || 0;
+
+    const pesoEstimadoAuto = 
+        (armarios * 60) + 
+        (cajas * 15) + 
+        (bultos * 20) + 
+        (sofas * 50) +
+        (mesas * 40) +
+        (sillas * 10) +
+        (camaMatrimonio * 70) +
+        (camaIndividual * 40);
+
+    // --- Peso manual ---
+    const pesoManual = parseInt(document.getElementById("pesoManual").value) || 0;
+    const pesoFinal = pesoManual > 0 ? pesoManual : pesoEstimadoAuto;
+
+    // --- Ajuste precio por peso ---
+    if (pesoFinal > 200 && pesoFinal <= 500) {
+      total += 20;
+    } else if (pesoFinal > 500) {
+      total += 40;
+    }
+
     const precioKm = 1.2;
     const sevillaCenterLatLng = new google.maps.LatLng(37.3980, -5.9650);
     const sevillaRadius = 6500;
@@ -383,7 +414,8 @@ function initMap() {
       total = 35;
     }
 
-    document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
+    document.getElementById('precioTotal').textContent = 
+      `Precio estimado: ${total.toFixed(2)} €  (⚠️ Recuerde: es orientativo, el precio final depende de tiempo, carga y peso: ${pesoFinal} kg)`;
   }
 
   window.actualizarPrecio = actualizarPrecio;
@@ -418,6 +450,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.actualizarPrecio) window.actualizarPrecio();
     });
   });
+
+  // recalcular al escribir peso u objetos
+  const inputs = document.querySelectorAll('#armarios,#cajas,#bultos,#sofas,#mesas,#sillas,#camaMatrimonio,#camaIndividual,#pesoManual');
+  inputs.forEach(inp => {
+    inp.addEventListener('input', () => {
+      if (window.actualizarPrecio) window.actualizarPrecio();
+    });
+  });
 });
 
 function enviarSolicitud() {
@@ -430,8 +470,14 @@ function enviarSolicitud() {
   const armarios = document.getElementById('armarios').value;
   const cajas = document.getElementById('cajas').value;
   const bultos = document.getElementById('bultos').value;
-  const otros = document.getElementById('otros-objetos').value.trim();
+  const sofas = document.getElementById('sofas').value;
+  const mesas = document.getElementById('mesas').value;
+  const sillas = document.getElementById('sillas').value;
+  const camaMatrimonio = document.getElementById('camaMatrimonio').value;
+  const camaIndividual = document.getElementById('camaIndividual').value;
+  const pesoManual = document.getElementById('pesoManual').value;
 
+  const otros = document.getElementById('otros-objetos').value.trim();
   const precio = document.getElementById('precioTotal').textContent;
 
   if (!nombre || !telefono || !origen || !destino) {
@@ -442,7 +488,7 @@ function enviarSolicitud() {
   let mensaje = `Presupuesto pedido por ${nombre}%0A`;
   mensaje += `Teléfono: ${telefono}%0A`;
   mensaje += `Origen: ${origen}%0ADestino: ${destino}%0A`;
-  mensaje += `Objetos:%0A- Armarios: ${armarios}%0A- Cajas: ${cajas}%0A- Bultos: ${bultos}%0A- Otros: ${otros || 'Ninguno'}%0A`;
+  mensaje += `Objetos:%0A- Armarios: ${armarios}%0A- Cajas: ${cajas}%0A- Bultos: ${bultos}%0A- Sofás: ${sofas}%0A- Mesas: ${mesas}%0A- Sillas: ${sillas}%0A- Cama matrimonio: ${camaMatrimonio}%0A- Cama individual: ${camaIndividual}%0A- Peso manual: ${pesoManual || 'No indicado'} kg%0A- Otros: ${otros || 'Ninguno'}%0A`;
   mensaje += `Notas adicionales: ${notas || 'Ninguna'}%0A`;
   mensaje += `${precio}%0A%0AGracias por confiar en nosotros.`;
 
@@ -468,6 +514,7 @@ function enviarSolicitud() {
   </div>
 </body>
 </html>
+
 
 
 
