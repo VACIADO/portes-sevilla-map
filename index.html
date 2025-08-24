@@ -19,10 +19,6 @@
     h1, h2 { text-align:center; margin: 10px 0 12px; }
     p { line-height: 1.5; }
     ul { font-size:16px; line-height:1.6; margin:0 0 14px; padding-left:18px; }
-    table { width:100%; border-collapse: collapse; font-size:16px; margin:10px 0 20px; border-radius:10px; overflow:hidden; }
-    table th, table td { padding:10px; text-align:center; }
-    thead th { background:#f0f4ff; }
-    tbody tr:nth-child(odd){ background:#fafafa;}
     input, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; background:#fff; }
     label { display:block; margin-bottom: 10px; font-size:15px; }
     .check { display:flex; align-items:center; gap:10px; margin:6px 0; }
@@ -101,7 +97,7 @@
 
     <h2>🎨 Pintura e Impermeabilización</h2>
     <div class="cards">
-      <!-- IMÁGENES "ESTILO IA" QUE SIEMPRE CARGAN -->
+      <!-- IMÁGENES inline (siempre cargan) -->
       <div class="card">
         <img alt="Impermeabilización de azotea"
              src="data:image/svg+xml;utf8,
@@ -216,15 +212,15 @@
         </label>
       </div>
 
-      <!-- NIVELES (no se suman entre sí, el script usa la jerarquía) -->
-      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="0"> Porte local (ayuda a pie de calle incluida)</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="0"> Porte + Carga y descarga</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="0"> Mudanza pequeña</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza completa" data-price="0"> Mudanza completa</label>
+      <!-- NIVELES (texto con precios “desde … €”) -->
+      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="0"> Porte local (ayuda a pie de calle incluida) <strong>– desde 35 €</strong></label>
+      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="0"> Porte + Carga y descarga <strong>– desde 60 €</strong></label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="0"> Mudanza pequeña <strong>– desde 90 €</strong></label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza completa" data-price="0"> Mudanza completa <strong>– desde 140 €</strong></label>
 
       <!-- EXTRAS -->
-      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso (desde 150 €)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave (desde 180 €)</label>
       <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización</label>
 
       <h3>📦 Objetos</h3>
@@ -324,20 +320,12 @@ window.distanciaKm = 0;
 const SEVILLA_CENTER = { lat: 37.3980, lng: -5.9650 };
 const SEVILLA_RADIUS_M = 6500; // 6,5 km
 
-// Bases por nivel (uniformes)
+// Bases por nivel (siempre en orden de menor a mayor)
 const BASES = {
   porte: 35,
   porte_cyd: 60,
   mudanza_peq: 90,
   mudanza_comp: 140
-};
-
-// Para pintar "desde X €" al lado de cada nivel sin tocar el HTML
-const NIVEL_HINTS = {
-  'porte local (ayuda pie de calle)': ` (desde ${BASES.porte} €)`,
-  'carga y descarga': ` (desde ${BASES.porte_cyd} €)`,
-  'mudanza pequeña': ` (desde ${BASES.mudanza_peq} €)`,
-  'mudanza completa': ` (desde ${BASES.mudanza_comp} €)`
 };
 
 function initMap() {
@@ -379,30 +367,6 @@ function initMap() {
   ["armarios","cajas","bultos","sofas","camaMatrimonio","camaIndividual","pesoManual"].forEach(id=>{
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', actualizarPrecio);
-  });
-
-  // Pinta hints "(desde X €)" al lado de cada nivel
-  pintarHintsNiveles();
-}
-
-function pintarHintsNiveles(){
-  document.querySelectorAll('.option').forEach(op=>{
-    const name = (op.dataset.name || '').toLowerCase();
-    const label = op.closest('label');
-    if (!label) return;
-    for (const key in NIVEL_HINTS){
-      if (name.includes(key)){
-        // evita duplicados
-        if (!label.querySelector('.nivel-hint')){
-          const s = document.createElement('span');
-          s.className = 'nivel-hint';
-          s.style.color = '#555';
-          s.style.fontSize = '13px';
-          s.textContent = NIVEL_HINTS[key];
-          label.appendChild(s);
-        }
-      }
-    }
   });
 }
 
@@ -478,7 +442,7 @@ function resetRuta(){
   actualizarPrecio();
 }
 
-/* ===== LÓGICA DE NIVELES ===== */
+/* ===== NIVELES ===== */
 function hasOption(substr){
   substr = (substr||"").toLowerCase();
   return Array.from(document.querySelectorAll('.option')).some(op=>{
@@ -493,7 +457,6 @@ function getTier(){
   const mudPeq    = hasOption('mudanza pequeña');
   const mudComp   = hasOption('mudanza completa');
 
-  // Prioridad: mudanza completa > mudanza pequeña > porte + C/D > porte
   if (mudComp) return 'mudanza_comp';
   if (mudPeq)   return 'mudanza_peq';
   if (porte && carga) return 'porte_cyd';
@@ -501,31 +464,27 @@ function getTier(){
   return null;
 }
 
-/* ===== PESO ===== */
+/* ===== PESO Y PEÓN ===== */
 function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
-  // Pesos estimados por unidad
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
-
 function recargoPorPeso(peso, tier){
-  // Solo suma si NO es porte simple
+  // SOLO aplica si hay C/D o mudanza
   if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
   if (peso <= 200) return 0;
   if (peso <= 500) return 20;
   if (peso <= 800) return 40;
-  return 60; // >800 kg
+  return 60;
 }
-
-// Peón por objetos pesados: 1 peón si >=1 pesado; 2 peones si >=3 pesados
 function peonPorObjetos(tier){
   if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
-  const pesados = n('sofas') + n('armarios') + n('camaMatrimonio');
-  if (pesados >= 3) return 50;     // 2 peones sugeridos
-  if (pesados >= 1) return 25;     // 1 peón sugerido
+  const dosPersonas = n('sofas') + n('armarios') + n('camaMatrimonio');
+  if (dosPersonas >= 2) return 50;
+  if (dosPersonas >= 1) return 25;
   return 0;
 }
 
@@ -560,13 +519,14 @@ function actualizarPrecio() {
   // Peso (solo si C/D o mudanza)
   const pesoCost = recargoPorPeso(peso, tier);
 
-  // Peón sugerido por objetos pesados
-  const peonAuto = peonPorObjetos(tier);
+  // Peón según objetos (y refuerzo si muchísimo peso)
+  let peonAuto = peonPorObjetos(tier);
+  if (tier && peso >= 650) peonAuto += 25;
 
   let total = base + extras + kmCost + pesoCost + peonAuto;
 
-  // Mínimo 35 € si ambas direcciones dentro de Sevilla y el nivel es porte
-  if (tier==='porte' && ambasDentro && total < 35) total = 35;
+  // Mínimo en Sevilla capital si hay nivel seleccionado
+  if (tier && ambasDentro && total < 35) total = 35;
 
   // UI
   const pesoEl = document.getElementById("pesoTotal");
@@ -575,14 +535,19 @@ function actualizarPrecio() {
   if (precioEl) precioEl.textContent = `Precio estimado: ${total.toFixed(2)} €`;
   const desg = document.getElementById("desglose");
   if (desg) {
-    const tierTxt = tier ? tier.replace('_',' ').toUpperCase() : 'sin seleccionar';
+    const tierTxt = tier ? ({
+      'porte':'PORTE',
+      'porte_cyd':'PORTE + C/D',
+      'mudanza_peq':'MUDANZA PEQUEÑA',
+      'mudanza_comp':'MUDANZA COMPLETA'
+    }[tier]) : 'SIN NIVEL';
     const partes = [
       `Nivel: ${tierTxt} (${base.toFixed(2)} €)`,
       `Extras: ${extras.toFixed(2)} €`,
       `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
     ];
     if (pesoCost>0) partes.push(`Peso: ${pesoCost.toFixed(2)} €`);
-    if (peonAuto>0) partes.push(`Peón sugerido: ${peonAuto.toFixed(2)} €`);
+    if (peonAuto>0) partes.push(`Peón: ${peonAuto.toFixed(2)} €`);
     if (ambasDentro) partes.push(`Tarifa Sevilla capital`);
     desg.textContent = partes.join(" · ");
   }
@@ -621,11 +586,9 @@ function abrirModal(){ const m=document.getElementById('modal'); if(!m) return; 
 function cerrarModal(){ const m=document.getElementById('modal'); if(!m) return; m.style.display='none'; m.setAttribute('aria-hidden','true'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarModal(); });
 document.addEventListener('click', e=>{ const m=document.getElementById('modal'); if(!m||m.style.display==='none') return; if(e.target===m) cerrarModal(); });
-</script>
-
+  </script>
 
   <!-- Google Maps API (incluye geometry para el círculo y la distancia) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 </body>
 </html>
-
