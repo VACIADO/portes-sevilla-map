@@ -18,11 +18,14 @@
     .container { max-width: 900px; width: 95%; margin: 18px auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
     h1, h2 { text-align:center; margin: 10px 0 12px; }
     p { line-height: 1.5; }
-    ul { font-size:16px; line-height:1.6; margin:0 0 14px; padding-left:18px; }
-    table { width:100%; border-collapse: collapse; font-size:16px; margin:10px 0 20px; border-radius:10px; overflow:hidden; }
-    table th, table td { padding:10px; text-align:center; }
-    thead th { background:#f0f4ff; }
-    tbody tr:nth-child(odd){ background:#fafafa;}
+
+    /* Lista de servicios con precio alineado al extremo derecho */
+    .services { list-style:none; padding:0; margin:0; border:1px solid #eee; border-radius:12px; overflow:hidden; }
+    .services li { display:flex; gap:8px; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px dashed #eee; }
+    .services li:last-child { border-bottom:none; }
+    .service-title { display:flex; align-items:center; gap:8px; }
+    .service-price { margin-left:auto; color:#007BFF; font-weight:700; font-size:14px; min-width:110px; text-align:right; }
+
     input, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; background:#fff; }
     label { display:block; margin-bottom: 10px; font-size:15px; }
     .check { display:flex; align-items:center; gap:10px; margin:6px 0; }
@@ -43,6 +46,7 @@
     .aviso span { color:#0e8f3a; }
     .banner { background:#ffe9b3; padding:16px; border-radius:10px; margin:18px 0; text-align:center; font-size:18px; font-weight:bold; color:#4b4b4b; border:1px dashed #f2c66d; }
     .banner span { color:#c0392b; }
+
     .cards { display:grid; grid-template-columns: 1fr; gap:14px; margin: 12px 0 6px; }
     .card { border:1px solid #eee; border-radius:12px; overflow:hidden; background:#fff; display:grid; grid-template-columns: 110px 1fr; gap:12px; align-items:center; }
     .card img { width:110px; height:100%; object-fit:cover; display:block; }
@@ -50,6 +54,7 @@
     .card-title { font-weight:700; margin:0 0 6px; }
     .card-text { margin:0; color:#444; font-size:14px; }
     .badge { display:inline-block; background:#eaf8ec; color:#0e8f3a; border:1px solid #cdeed2; padding:4px 8px; border-radius:999px; font-size:12px; margin-top:6px;}
+
     .cta-inline { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
     .muted { color:#777; font-size:14px; text-align:center; margin:6px 0 0; }
     .desglose { font-size:13px; color:#555; text-align:center; margin:6px 0 0; }
@@ -89,37 +94,40 @@
       <span>No dejes que la humedad te sorprenda.</span>
     </div>
 
-    <h2>📋 Servicios</h2>
-    <ul>
-      <li>✅ Portes económicos (solo transporte o con ayuda a pie de calle)</li>
-      <li>✅ Mudanzas completas con carga y descarga</li>
-      <li>✅ Vaciado de pisos, naves y trasteros</li>
-      <li>✅ Transporte de muebles y electrodomésticos</li>
-      <li>✅ Limpieza post-vaciado</li>
-      <li>✅ Pintura e impermeabilización</li>
+    <h2>📋 Servicios (precios orientativos)</h2>
+    <ul class="services">
+      <li>
+        <div class="service-title">✅ Portes económicos (solo transporte / ayuda a pie de calle)</div>
+        <span class="service-price">desde 35 €</span>
+      </li>
+      <li>
+        <div class="service-title">✅ Porte + carga y descarga</div>
+        <span class="service-price">desde 60 €</span>
+      </li>
+      <li>
+        <div class="service-title">✅ Mudanza pequeña (con peón)</div>
+        <span class="service-price">desde 90 €</span>
+      </li>
+      <li>
+        <div class="service-title">✅ Vaciado de piso (60–90 m²)</div>
+        <span class="service-price">desde 150 €</span>
+      </li>
+      <li>
+        <div class="service-title">✅ Vaciado de nave</div>
+        <span class="service-price">desde 180 €</span>
+      </li>
+      <li>
+        <div class="service-title">✅ Pintura e impermeabilización</div>
+        <span class="service-price">según m²</span>
+      </li>
     </ul>
 
     <h2>🎨 Pintura e Impermeabilización</h2>
     <div class="cards">
-      <!-- Imágenes inline para que siempre carguen -->
+      <!-- Imágenes embebidas (siempre cargan) -->
       <div class="card">
         <img alt="Impermeabilización de azotea"
-             src="data:image/svg+xml;utf8,
-<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
-  <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-    <stop offset='0%' stop-color='%23007BFF'/><stop offset='100%' stop-color='%2346A2FF'/>
-  </linearGradient></defs>
-  <rect width='100%%' height='100%%' fill='url(%23g)'/>
-  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
-    <text x='16' y='36'>IMPERMEABILIZACIÓN</text>
-    <text x='16' y='64'>DE AZOTEA</text>
-  </g>
-  <g stroke='%23fff' stroke-width='4' fill='none'>
-    <path d='M30,150 L270,150'/>
-    <path d='M50,80 L150,40 L250,80 L250,150 L50,150 Z'/>
-    <path d='M90,150 C110,130 130,130 150,150 C170,170 190,170 210,150'/>
-  </g>
-</svg>"/>
+             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%23007BFF'/><stop offset='100%' stop-color='%2346A2FF'/></linearGradient></defs><rect width='100%25' height='100%25' fill='url(%23g)'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>IMPERMEABILIZACIÓN</text><text x='16' y='64'>DE AZOTEA</text></g><g stroke='%23fff' stroke-width='4' fill='none'><path d='M30,150 L270,150'/><path d='M50,80 L150,40 L250,80 L250,150 L50,150 Z'/><path d='M90,150 C110,130 130,130 150,150 C170,170 190,170 210,150'/></g></svg>"/>
         <div class="card-body">
           <p class="card-title">Impermeabilización de Azoteas</p>
           <p class="card-text">Sellado de juntas, lámina líquida y reparaciones. Trabajo garantizado.</p>
@@ -128,23 +136,7 @@
       </div>
       <div class="card">
         <img alt="Pintura de vivienda"
-             src="data:image/svg+xml;utf8,
-<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
-  <rect width='100%%' height='100%%' fill='%23f39c12'/>
-  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
-    <text x='16' y='36'>PINTURA</text>
-    <text x='16' y='64'>DE VIVIENDA</text>
-  </g>
-  <g stroke='%23fff' stroke-width='5' fill='none'>
-    <rect x='180' y='40' width='80' height='80' rx='6'/>
-    <path d='M40,160 L260,160'/>
-    <path d='M60,120 L140,120'/>
-  </g>
-  <g fill='%23fff'>
-    <rect x='60' y='90' width='16' height='46' rx='3'/>
-    <rect x='54' y='136' width='28' height='10' rx='3'/>
-  </g>
-</svg>"/>
+             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%23f39c12'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>PINTURA</text><text x='16' y='64'>DE VIVIENDA</text></g><g stroke='%23fff' stroke-width='5' fill='none'><rect x='180' y='40' width='80' height='80' rx='6'/><path d='M40,160 L260,160'/><path d='M60,120 L140,120'/></g><g fill='%23fff'><rect x='60' y='90' width='16' height='46' rx='3'/><rect x='54' y='136' width='28' height='10' rx='3'/></g></svg>"/>
         <div class="card-body">
           <p class="card-title">Pintura de Viviendas</p>
           <p class="card-text">Pisos, trasteros y naves. Acabado limpio y rápido.</p>
@@ -153,19 +145,7 @@
       </div>
       <div class="card">
         <img alt="Pintura de naves y suelos epoxi"
-             src="data:image/svg+xml;utf8,
-<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
-  <rect width='100%%' height='100%%' fill='%2327ae60'/>
-  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
-    <text x='16' y='36'>PINTURA DE NAVE</text>
-    <text x='16' y='64'>SUELO EPOXI</text>
-  </g>
-  <g stroke='%23fff' stroke-width='4' fill='none'>
-    <rect x='30' y='90' width='240' height='70' rx='4'/>
-    <path d='M30,120 L270,120'/>
-    <path d='M60,160 L120,100 L180,160 L240,100'/>
-  </g>
-</svg>"/>
+             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%2327ae60'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>PINTURA DE NAVE</text><text x='16' y='64'>SUELO EPOXI</text></g><g stroke='%23fff' stroke-width='4' fill='none'><rect x='30' y='90' width='240' height='70' rx='4'/><path d='M30,120 L270,120'/><path d='M60,160 L120,100 L180,160 L240,100'/></g></svg>"/>
         <div class="card-body">
           <p class="card-title">Pintura de Naves</p>
           <p class="card-text">Suelos epoxi, paredes y techos. Protección y estética.</p>
@@ -174,19 +154,7 @@
       </div>
       <div class="card">
         <img alt="Sellado y humedades"
-             src="data:image/svg+xml;utf8,
-<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
-  <rect width='100%%' height='100%%' fill='%239b59b6'/>
-  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
-    <text x='16' y='36'>SELLADO</text>
-    <text x='16' y='64'>Y HUMEDADES</text>
-  </g>
-  <g stroke='%23fff' stroke-width='4' fill='none'>
-    <path d='M40,150 C80,110 120,190 160,150 C200,110 240,190 260,150'/>
-    <circle cx='220' cy='110' r='14'/>
-    <path d='M220,96 L220,70'/>
-  </g>
-</svg>"/>
+             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%239b59b6'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>SELLADO</text><text x='16' y='64'>Y HUMEDADES</text></g><g stroke='%23fff' stroke-width='4' fill='none'><path d='M40,150 C80,110 120,190 160,150 C200,110 240,190 260,150'/><circle cx='220' cy='110' r='14'/><path d='M220,96 L220,70'/></g></svg>"/>
         <div class="card-body">
           <p class="card-title">Sellado y Humedades</p>
           <p class="card-text">Tratamiento de filtraciones y grietas. Soluciones duraderas.</p>
@@ -216,16 +184,13 @@
         </label>
       </div>
 
-      <!-- Servicios base (mostrar precio orientativo en el texto) -->
-      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="35"> Porte local (ayuda a pie de calle incluida) — desde 35 €</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="25"> Carga y descarga adicional (convierte el porte en Porte + C/D) — base 60 €</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="90"> Mudanza pequeña — desde 90 €</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza completa" data-price="140"> Mudanza completa — desde 140 €</label>
-
-      <!-- Extras que sí suman -->
-      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso (desde 150 €)</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave (desde 180 €)</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización (precio a medida)</label>
+      <!-- En el formulario NO hay precios visibles -->
+      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="35"> Porte local (ayuda a pie de calle incluida)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Porte + carga y descarga" data-price="60"> Porte + carga y descarga</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña (con peón)" data-price="90"> Mudanza pequeña (con peón)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización</label>
 
       <h3>📦 Objetos</h3>
       <div class="grid-3">
@@ -324,14 +289,6 @@ window.distanciaKm = 0;
 const SEVILLA_CENTER = { lat: 37.3980, lng: -5.9650 };
 const SEVILLA_RADIUS_M = 6500; // 6,5 km
 
-// Bases por nivel (jerarquía uniforme)
-const BASES = {
-  porte: 35,             // Porte solo (ayuda a pie de calle)
-  porte_cyd: 60,         // Porte + Carga/Descarga
-  mudanza_peq: 90,       // Mudanza pequeña
-  mudanza_comp: 140      // Mudanza completa
-};
-
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), { center: SEVILLA_CENTER, zoom: 12 });
   geocoder = new google.maps.Geocoder();
@@ -423,7 +380,7 @@ function calcularDistancia() {
       document.getElementById("distanciaRuta").textContent = `Distancia de la ruta: ${window.distanciaKm.toFixed(1)} km`;
       actualizarPrecio();
     } else {
-      // Fallback: distancia aprox. en línea recta
+      // Fallback: distancia en línea recta (aprox.)
       const a = originMarker.getPosition();
       const b = destinationMarker.getPosition();
       const straight = google.maps.geometry.spherical.computeDistanceBetween(a, b) / 1000;
@@ -446,138 +403,84 @@ function resetRuta(){
   actualizarPrecio();
 }
 
-/* ===== UTILIDADES OPCIONES ===== */
-function isChecked(substr){
-  substr = (substr||"").toLowerCase();
-  return Array.from(document.querySelectorAll('.option')).some(op=>{
-    const n=(op.dataset.name||"").toLowerCase();
-    return op.checked && n.includes(substr);
-  });
-}
-
-/*
-  Lógica del nivel (jerarquía):
-  Mudanza completa > mudanza pequeña > (porte + carga) > porte
-  Si el usuario marca SOLO "Carga y descarga adicional", lo tratamos como "Porte + C/D".
-*/
-function getTier(){
-  const porte     = isChecked('porte local');
-  const carga     = isChecked('carga y descarga');
-  const mudPeq    = isChecked('mudanza pequeña');
-  const mudComp   = isChecked('mudanza completa');
-
-  if (mudComp) return 'mudanza_comp';
-  if (mudPeq)   return 'mudanza_peq';
-  if (carga && !porte) return 'porte_cyd'; // carga sola implica porte+c/d
-  if (porte && carga) return 'porte_cyd';
-  if (porte)    return 'porte';
-  return null;
-}
-
-/* ===== PESO Y PEÓN ===== */
 function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
+  // Pesos estimados por unidad
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
-function recargoPorPeso(peso, tier){
-  // SOLO aplica si hay C/D o mudanza (porte solo NO suma por peso)
-  if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
+
+function recargoPorPeso(peso){
   if (peso <= 200) return 0;
   if (peso <= 500) return 20;
   if (peso <= 800) return 40;
-  return 60;
-}
-function peonPorObjetos(tier){
-  if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
-  const n = id => parseInt(document.getElementById(id)?.value) || 0;
-  const dosPersonas = n('sofas') + n('armarios') + n('camaMatrimonio');
-  if (dosPersonas >= 2) return 50; // 2 bultos pesados → 2 peones o 1 extra
-  if (dosPersonas >= 1) return 25; // 1 bulto pesado → 1 peón
-  return 0;
+  return 60; // >800 kg
 }
 
-/* ===== PRECIO TOTAL ===== */
 function actualizarPrecio() {
-  const tier = getTier();
-  const peso = calcularPeso();
-
-  // Base por nivel (no sumamos niveles entre sí)
   let base = 0;
-  if (tier) base = BASES[tier];
-
-  // Extras (vaciados/pintura) sí suman
-  let extras = 0;
-  document.querySelectorAll('.option').forEach(op=>{
-    if (!op.checked) return;
-    const name = (op.dataset.name||"").toLowerCase();
-    const isTier = name.includes('porte local') || name.includes('carga y descarga') || name.includes('mudanza pequeña') || name.includes('mudanza completa');
-    if (!isTier) extras += parseFloat(op.dataset.price) || 0;
+  document.querySelectorAll('.option').forEach(op => {
+    if (op.checked) base += parseFloat(op.dataset.price) || 0;
   });
 
-  // Km
-  let kmRate = 1.2, ambasDentro = false;
+  // Tarifa km según si A y B están dentro del círculo
+  let kmRate = 1.2; // fuera
+  let ambasDentro = false;
   if (originMarker && destinationMarker) {
     const dentroA = insideSevilla(originMarker.getPosition());
     const dentroB = insideSevilla(destinationMarker.getPosition());
-    ambasDentro = dentroA && dentroB;
+    ambasDentro = (dentroA && dentroB);
     if (ambasDentro) kmRate = 0.9;
   }
-  const kmCost = (window.distanciaKm>0) ? window.distanciaKm*kmRate : 0;
 
-  // Peso (solo si C/D o mudanza)
-  const pesoCost = recargoPorPeso(peso, tier);
+  let kmCost = 0;
+  if (window.distanciaKm > 0) kmCost = window.distanciaKm * kmRate;
 
-  // Peón según objetos (y refuerzo si muchísimo peso)
-  let peonAuto = peonPorObjetos(tier);
-  if (tier && peso >= 650) peonAuto += 25;
+  // Peso
+  const peso = calcularPeso();
+  const pesoCost = recargoPorPeso(peso);
 
-  let total = base + extras + kmCost + pesoCost + peonAuto;
+  // Peón automático si NO hay carga/descarga marcada y el peso es alto
+  const tieneCargaDesc = Array.from(document.querySelectorAll('.option')).some(op => op.checked && (op.dataset.name||'').toLowerCase().includes('carga y descarga'));
+  let peonAuto = 0;
+  if (!tieneCargaDesc && peso >= 400) peonAuto = 25;
 
-  // Mínimo en Sevilla capital si hay nivel seleccionado
-  if (tier && ambasDentro && total < 35) total = 35;
+  let total = base + kmCost + pesoCost + peonAuto;
 
-  // UI
-  const pesoEl = document.getElementById("pesoTotal");
-  if (pesoEl) pesoEl.textContent = `Peso estimado: ${peso} kg`;
-  const precioEl = document.getElementById("precioTotal");
-  if (precioEl) precioEl.textContent = `Precio estimado: ${total.toFixed(2)} €`;
-  const desg = document.getElementById("desglose");
-  if (desg) {
-    const tierTxt = tier ? ({
-      'porte':'PORTE',
-      'porte_cyd':'PORTE + C/D',
-      'mudanza_peq':'MUDANZA PEQUEÑA',
-      'mudanza_comp':'MUDANZA COMPLETA'
-    }[tier]) : 'SIN NIVEL';
-    const partes = [
-      `Nivel: ${tierTxt} (${base.toFixed(2)} €)`,
-      `Extras: ${extras.toFixed(2)} €`,
-      `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
-    ];
-    if (pesoCost>0) partes.push(`Peso: ${pesoCost.toFixed(2)} €`);
-    if (peonAuto>0) partes.push(`Peón: ${peonAuto.toFixed(2)} €`);
-    if (ambasDentro) partes.push(`Tarifa Sevilla capital`);
-    desg.textContent = partes.join(" · ");
-  }
+  // Mínimo en Sevilla capital
+  if (ambasDentro && total < 35) total = 35;
+
+  // Pintar UI
+  document.getElementById("pesoTotal").textContent = `Peso estimado: ${peso} kg`;
+  document.getElementById("precioTotal").textContent = `Precio estimado: ${total.toFixed(2)} €`;
+
+  const desglose = [
+    `Base servicios: ${base.toFixed(2)} €`,
+    window.distanciaKm ? `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €` : null,
+    `Recargo por peso: ${pesoCost.toFixed(2)} €`,
+    peonAuto ? `Peón recomendado por peso: ${peonAuto.toFixed(2)} €` : null,
+    ambasDentro ? `Mínimo Sevilla capital aplicado si procede` : null
+  ].filter(Boolean).join(" · ");
+
+  document.getElementById("desglose").textContent = desglose;
 }
 
-/* ===== ENVÍO WHATSAPP + MODAL ===== */
 function enviarSolicitud() {
-  const nombre = document.getElementById('nombre')?.value.trim();
-  const telefono = document.getElementById('telefono')?.value.trim();
-  const origen = document.getElementById('origen')?.value.trim();
-  const destino = document.getElementById('destino')?.value.trim();
-  const notas = document.getElementById('notas')?.value.trim();
+  const nombre = document.getElementById('nombre').value.trim();
+  const telefono = document.getElementById('telefono').value.trim();
+  const origen = document.getElementById('origen').value.trim();
+  const destino = document.getElementById('destino').value.trim();
+  const notas = document.getElementById('notas').value.trim();
 
   if (!nombre || !telefono || !origen || !destino) {
     alert("Por favor, completa nombre, WhatsApp, origen y destino.");
     return;
   }
-  const precio = document.getElementById('precioTotal')?.textContent || '';
-  const peso = document.getElementById('pesoTotal')?.textContent || '';
-  const distancia = document.getElementById('distanciaRuta')?.textContent || '';
+
+  const precio = document.getElementById('precioTotal').textContent;
+  const peso = document.getElementById('pesoTotal').textContent;
+  const distancia = document.getElementById('distanciaRuta').textContent;
 
   let mensaje = `Presupuesto pedido por ${nombre}%0A`;
   mensaje += `Teléfono: ${telefono}%0A`;
