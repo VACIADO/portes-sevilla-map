@@ -216,9 +216,13 @@
         </label>
       </div>
 
-      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="35"> Porte local (ayuda a pie de calle incluida)</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="25"> Carga y descarga adicional</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="90"> Mudanza pequeña</label>
+      <!-- NIVELES (no se suman entre sí, el script usa la jerarquía) -->
+      <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="0"> Porte local (ayuda a pie de calle incluida)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="0"> Porte + Carga y descarga</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="0"> Mudanza pequeña</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza completa" data-price="0"> Mudanza completa</label>
+
+      <!-- EXTRAS -->
       <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso</label>
       <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
       <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización</label>
@@ -319,6 +323,14 @@ window.distanciaKm = 0;
 
 const SEVILLA_CENTER = { lat: 37.3980, lng: -5.9650 };
 const SEVILLA_RADIUS_M = 6500; // 6,5 km
+
+// Bases por nivel (uniformes)
+const BASES = {
+  porte: 35,
+  porte_cyd: 60,
+  mudanza_peq: 90,
+  mudanza_comp: 140
+};
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), { center: SEVILLA_CENTER, zoom: 12 });
@@ -434,84 +446,120 @@ function resetRuta(){
   actualizarPrecio();
 }
 
+/* ===== LÓGICA DE NIVELES ===== */
+function hasOption(substr){
+  substr = (substr||"").toLowerCase();
+  return Array.from(document.querySelectorAll('.option')).some(op=>{
+    const n=(op.dataset.name||"").toLowerCase();
+    return op.checked && n.includes(substr);
+  });
+}
+
+function getTier(){
+  const porte     = hasOption('porte local');
+  const carga     = hasOption('carga y descarga');
+  const mudPeq    = hasOption('mudanza pequeña');
+  const mudComp   = hasOption('mudanza completa');
+
+  if (mudComp) return 'mudanza_comp';
+  if (mudPeq)   return 'mudanza_peq';
+  if (porte && carga) return 'porte_cyd';
+  if (porte)    return 'porte';
+  return null;
+}
+
+/* ===== PESO ===== */
 function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
-  // Pesos estimados por unidad
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
-
-function recargoPorPeso(peso){
+function recargoPorPeso(peso, tier){
+  if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
   if (peso <= 200) return 0;
   if (peso <= 500) return 20;
   if (peso <= 800) return 40;
-  return 60; // >800 kg
+  return 60;
 }
 
+/* ===== PRECIO TOTAL ===== */
 function actualizarPrecio() {
+  const tier = getTier();
+  const peso = calcularPeso();
+
+  // Base por nivel (no sumamos niveles)
   let base = 0;
-  document.querySelectorAll('.option').forEach(op => {
-    if (op.checked) base += parseFloat(op.dataset.price) || 0;
+  if (tier) base = BASES[tier];
+
+  // Extras (vaciados/pintura) sí suman
+  let extras = 0;
+  document.querySelectorAll('.option').forEach(op=>{
+    if (!op.checked) return;
+    const name = (op.dataset.name||"").toLowerCase();
+    const isTier = name.includes('porte local') || name.includes('carga y descarga') || name.includes('mudanza pequeña') || name.includes('mudanza completa');
+    if (!isTier) extras += parseFloat(op.dataset.price) || 0;
   });
 
-  // Tarifa km según si A y B están dentro del círculo
-  let kmRate = 1.2; // fuera
-  let ambasDentro = false;
+  // Km
+  let kmRate = 1.2, ambasDentro = false;
   if (originMarker && destinationMarker) {
     const dentroA = insideSevilla(originMarker.getPosition());
     const dentroB = insideSevilla(destinationMarker.getPosition());
-    ambasDentro = (dentroA && dentroB);
+    ambasDentro = dentroA && dentroB;
     if (ambasDentro) kmRate = 0.9;
   }
+  const kmCost = (window.distanciaKm>0) ? window.distanciaKm*kmRate : 0;
 
-  let kmCost = 0;
-  if (window.distanciaKm > 0) kmCost = window.distanciaKm * kmRate;
+  // Peso (solo si C/D o mudanza)
+  const pesoCost = recargoPorPeso(peso, tier);
 
-  // Peso
-  const peso = calcularPeso();
-  const pesoCost = recargoPorPeso(peso);
-
-  // Peón automático si peso alto y NO marcaron "Carga y descarga adicional"
-  const tieneCargaDesc = Array.from(document.querySelectorAll('.option')).some(op => op.checked && (op.dataset.name||'').toLowerCase().includes('carga y descarga adicional'));
+  // Peón sugerido
   let peonAuto = 0;
-  if (!tieneCargaDesc && peso >= 400) peonAuto = 25;
+  if (tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp') {
+    if (peso >= 350 && peso < 650) peonAuto = 25;
+    else if (peso >= 650)          peonAuto = 50;
+  }
 
-  let total = base + kmCost + pesoCost + peonAuto;
+  let total = base + extras + kmCost + pesoCost + peonAuto;
 
-  // Mínimo en Sevilla capital
-  if (ambasDentro && total < 35) total = 35;
+  // Mínimo en Sevilla capital si hay nivel seleccionado
+  if (tier && ambasDentro && total < 35) total = 35;
 
-  // Pintar UI
-  document.getElementById("pesoTotal").textContent = `Peso estimado: ${peso} kg`;
-  document.getElementById("precioTotal").textContent = `Precio estimado: ${total.toFixed(2)} €`;
-
-  const desglose = [
-    `Base servicios: ${base.toFixed(2)} €`,
-    `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
-    `Recargo por peso: ${pesoCost.toFixed(2)} €`,
-    peonAuto ? `Peón recomendado por peso: ${peonAuto.toFixed(2)} €` : null,
-    ambasDentro ? `Mínimo Sevilla capital aplicado si procede` : null
-  ].filter(Boolean).join(" · ");
-
-  document.getElementById("desglose").textContent = desglose;
+  // UI
+  const pesoEl = document.getElementById("pesoTotal");
+  if (pesoEl) pesoEl.textContent = `Peso estimado: ${peso} kg`;
+  const precioEl = document.getElementById("precioTotal");
+  if (precioEl) precioEl.textContent = `Precio estimado: ${total.toFixed(2)} €`;
+  const desg = document.getElementById("desglose");
+  if (desg) {
+    const partes = [
+      `Nivel: ${tier ? tier.replace('_',' ').toUpperCase() : 'sin seleccionar'} (${base.toFixed(2)} €)`,
+      `Extras: ${extras.toFixed(2)} €`,
+      `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
+    ];
+    if (pesoCost>0) partes.push(`Peso: ${pesoCost.toFixed(2)} €`);
+    if (peonAuto>0) partes.push(`Peón sugerido: ${peonAuto.toFixed(2)} €`);
+    if (ambasDentro) partes.push(`Tarifa Sevilla capital`);
+    desg.textContent = partes.join(" · ");
+  }
 }
 
+/* ===== ENVÍO WHATSAPP + MODAL ===== */
 function enviarSolicitud() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
-  const origen = document.getElementById('origen').value.trim();
-  const destino = document.getElementById('destino').value.trim();
-  const notas = document.getElementById('notas').value.trim();
+  const nombre = document.getElementById('nombre')?.value.trim();
+  const telefono = document.getElementById('telefono')?.value.trim();
+  const origen = document.getElementById('origen')?.value.trim();
+  const destino = document.getElementById('destino')?.value.trim();
+  const notas = document.getElementById('notas')?.value.trim();
 
   if (!nombre || !telefono || !origen || !destino) {
     alert("Por favor, completa nombre, WhatsApp, origen y destino.");
     return;
   }
-
-  const precio = document.getElementById('precioTotal').textContent;
-  const peso = document.getElementById('pesoTotal').textContent;
-  const distancia = document.getElementById('distanciaRuta').textContent;
+  const precio = document.getElementById('precioTotal')?.textContent || '';
+  const peso = document.getElementById('pesoTotal')?.textContent || '';
+  const distancia = document.getElementById('distanciaRuta')?.textContent || '';
 
   let mensaje = `Presupuesto pedido por ${nombre}%0A`;
   mensaje += `Teléfono: ${telefono}%0A`;
