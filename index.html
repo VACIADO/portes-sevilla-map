@@ -170,38 +170,22 @@
       <label for="telefono">Número WhatsApp:</label>
       <input type="tel" id="telefono" placeholder="Ej: tu número" />
 
-    <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)" data-price="30"> Porte local (solo transporte)</label>
-<label><input type="checkbox" class="option" data-name="Porte + carga y descarga" data-price="60"> Porte + carga y descarga</label>
-<label><input type="checkbox" class="option" data-name="Mudanza pequeña en Sevilla" data-price="90"> Mudanza pequeña en Sevilla</label>
-<label><input type="checkbox" class="option" data-name="Vaciado de piso 60–90 m²" data-price="150"> Vaciado de piso 60–90 m²</label>
-<label><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
-<label><input type="checkbox" class="option" data-name="Limpieza post-vaciado (precio según tamaño y condiciones)" data-price="0"> Limpieza post-vaciado</label>
-<label><input type="checkbox" class="option" data-name="Pintura de piso, trastero o nave (precio según tamaño y necesidades)" data-price="0"> Pintura de piso, trastero o nave</label>
-<br><br>
-      <h3>📦 Selecciona objetos para tu mudanza/porte</h3>
-<div id="objetos-lista">
-  <div>
-    <label>Armarios:
-      <input type="number" id="armarios" min="0" value="0" style="width:60px; margin-left:5px;">
-    </label>
-  </div>
-  <div>
-    <label>Cajas:
-      <input type="number" id="cajas" min="0" value="0" style="width:60px; margin-left:5px;">
-    </label>
-  </div>
-  <div>
-    <label>Bultos:
-      <input type="number" id="bultos" min="0" value="0" style="width:60px; margin-left:5px;">
-    </label>
-  </div>
-  <div>
-    <label>Otros objetos:
-      <input type="text" id="otros-objetos" placeholder="Especifica aquí..." style="margin-left:5px; width:200px;">
-    </label>
-  </div>
-</div>
+      <label><input type="checkbox" class="option" data-name="Porte local (solo transporte)" data-price="30"> Porte local (solo transporte)</label>
+      <label><input type="checkbox" class="option" data-name="Porte + carga y descarga" data-price="60"> Porte + carga y descarga</label>
+      <label><input type="checkbox" class="option" data-name="Mudanza pequeña en Sevilla" data-price="90"> Mudanza pequeña en Sevilla</label>
+      <label><input type="checkbox" class="option" data-name="Vaciado de piso 60–90 m²" data-price="150"> Vaciado de piso 60–90 m²</label>
+      <label><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
+      <label><input type="checkbox" class="option" data-name="Limpieza post-vaciado" data-price="0"> Limpieza post-vaciado</label>
+      <label><input type="checkbox" class="option" data-name="Pintura de piso, trastero o nave" data-price="0"> Pintura de piso, trastero o nave</label>
+      <br><br>
 
+      <h3>📦 Selecciona objetos</h3>
+      <div id="objetos-lista">
+        <label>Armarios: <input type="number" id="armarios" min="0" value="0" style="width:60px; margin-left:5px;"></label>
+        <label>Cajas: <input type="number" id="cajas" min="0" value="0" style="width:60px; margin-left:5px;"></label>
+        <label>Bultos: <input type="number" id="bultos" min="0" value="0" style="width:60px; margin-left:5px;"></label>
+        <label>Otros objetos: <input type="text" id="otros-objetos" placeholder="Especifica aquí..." style="margin-left:5px; width:200px;"></label>
+      </div>
 
       <label for="origen">Dirección origen:</label>
       <input type="text" id="origen" placeholder="Marca en el mapa o escribe aquí" />
@@ -210,7 +194,7 @@
       <input type="text" id="destino" placeholder="Marca en el mapa o escribe aquí" />
 
       <label for="notas">Notas adicionales:</label>
-      <textarea id="notas" placeholder="Ej: Es una mudanza con cajas, sofá y nevera. Hay ascensor. ℹ️ Si hay objetos de valor, el vaciado puede salir gratis a cambio del contenido"></textarea>
+      <textarea id="notas" placeholder="Ej: Es una mudanza con cajas, sofá y nevera. Hay ascensor."></textarea>
 
       <div id="precioTotal">Precio estimado: 0 €</div>
 
@@ -222,7 +206,7 @@
 
     <h2>📞 Contacto directo</h2>
     <p style="font-size: 18px;">
-      📞 <strong>WhatsApp:</strong> <a href="https://wa.me/34698373471" target="_blank">Haz clic aquí para escribirnos</a><br />
+      📞 <strong>WhatsApp:</strong> <a href="https://wa.me/34698373471" target="_blank">Haz clic aquí</a><br />
       📧 <strong>Email:</strong> <a href="mailto:portemudanzayvaciadoprosevilla@gmail.com">portemudanzayvaciadoprosevilla@gmail.com</a><br />
       📷 <strong>Instagram:</strong> <a href="https://www.instagram.com/portemudanzayvaciadoprosevilla" target="_blank">@portemudanzayvaciadoprosevilla</a><br />
       📍 <strong>Ubicación:</strong> Sevilla y alrededores
@@ -233,6 +217,7 @@
     </div>
   </div>
 
+  <!-- SCRIPT -->
   <script>
 let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer;
 window.distanciaKm = 0;
@@ -240,25 +225,15 @@ window.distanciaKm = 0;
 function initMap() {
   const sevillaCenter = { lat: 37.3980, lng: -5.9650 };
 
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: sevillaCenter,
-    zoom: 12,
-  });
-
+  map = new google.maps.Map(document.getElementById("map"), { center: sevillaCenter, zoom: 12 });
   geocoder = new google.maps.Geocoder();
   directionsService = new google.maps.DirectionsService();
   directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
   const sevillaCircle = new google.maps.Circle({
-    strokeColor: '#007BFF',
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: '#007BFF',
-    fillOpacity: 0.15,
-    map: map,
-    center: sevillaCenter,
-    radius: 6500,
-    clickable: false,
+    strokeColor: '#007BFF', strokeOpacity: 0.8, strokeWeight: 2,
+    fillColor: '#007BFF', fillOpacity: 0.15,
+    map: map, center: sevillaCenter, radius: 6500, clickable: false,
   });
 
   const storeCoords = [
@@ -271,7 +246,6 @@ function initMap() {
 
   document.getElementById("map-instruction").textContent = "Toca en el mapa o escribe direcciones para marcar origen y destino.";
 
-  // --- CLICK EN EL MAPA ---
   map.addListener("click", (e) => {
     if (!originMarker) {
       originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
@@ -281,130 +255,67 @@ function initMap() {
       geocodePosition(e.latLng, "destino");
       calcularDistancia();
     } else {
-      // reset
-      originMarker.setMap(null);
-      destinationMarker.setMap(null);
-      originMarker = null;
-      destinationMarker = null;
+      originMarker.setMap(null); destinationMarker.setMap(null);
+      originMarker = null; destinationMarker = null;
       directionsRenderer.setDirections({ routes: [] });
       document.getElementById("origen").value = "";
       document.getElementById("destino").value = "";
-      window.distanciaKm = 0;
-      actualizarPrecio();
+      window.distanciaKm = 0; actualizarPrecio();
     }
     actualizarPrecio();
   });
 
   function geocodePosition(latlng, inputId) {
     geocoder.geocode({ location: latlng }, (results, status) => {
-      if (status === "OK" && results[0]) {
-        document.getElementById(inputId).value = results[0].formatted_address;
-      }
+      if (status === "OK" && results[0]) document.getElementById(inputId).value = results[0].formatted_address;
     });
   }
 
   function calcularDistancia() {
-    if (!originMarker || !destinationMarker) {
-      window.distanciaKm = 0;
-      actualizarPrecio();
-      return;
-    }
-
-    const request = {
-      origin: originMarker.getPosition(),
-      destination: destinationMarker.getPosition(),
-      travelMode: google.maps.TravelMode.DRIVING,
-    };
-
+    if (!originMarker || !destinationMarker) { window.distanciaKm = 0; actualizarPrecio(); return; }
+    const request = { origin: originMarker.getPosition(), destination: destinationMarker.getPosition(), travelMode: google.maps.TravelMode.DRIVING };
     directionsService.route(request, (result, status) => {
       if (status === "OK") {
         directionsRenderer.setDirections(result);
-        const ruta = result.routes[0];
-        const distanciaMetros = ruta.legs[0].distance.value;
+        const distanciaMetros = result.routes[0].legs[0].distance.value;
         window.distanciaKm = distanciaMetros / 1000;
         actualizarPrecio();
-      } else {
-        window.distanciaKm = 0;
-        actualizarPrecio();
-      }
+      } else { window.distanciaKm = 0; actualizarPrecio(); }
     });
   }
 
   function actualizarPrecio() {
-    const opciones = document.querySelectorAll('.option');
-    let total = 0;
-
-    opciones.forEach(op => {
-      if (op.checked) {
-        const precio = parseFloat(op.dataset.price) || 0;
-        total += precio;
-      }
-    });
-
-    const precioKm = 1.2;
-    const sevillaCenterLatLng = new google.maps.LatLng(37.3980, -5.9650);
-    const sevillaRadius = 6500;
-
-    let extraKm = 0;
-    let extraCost = 0;
-    let dentroSevilla = true;
+    const opciones = document.querySelectorAll('.option'); let total = 0;
+    opciones.forEach(op => { if (op.checked) total += parseFloat(op.dataset.price) || 0; });
+    const precioKm = 1.2, sevillaCenterLatLng = new google.maps.LatLng(37.3980, -5.9650), sevillaRadius = 6500;
+    let extraKm = 0, extraCost = 0, dentroSevilla = true;
 
     if (originMarker) {
-      const distOriginToCenter = google.maps.geometry.spherical.computeDistanceBetween(originMarker.getPosition(), sevillaCenterLatLng);
-      if (distOriginToCenter > sevillaRadius) {
-        dentroSevilla = false;
-        extraKm += (distOriginToCenter - sevillaRadius) / 1000;
-      }
-      if (!google.maps.geometry.poly.containsLocation(originMarker.getPosition(), storePolygon)) {
-        extraCost += 15;
-      }
+      const distOrigin = google.maps.geometry.spherical.computeDistanceBetween(originMarker.getPosition(), sevillaCenterLatLng);
+      if (distOrigin > sevillaRadius) { dentroSevilla = false; extraKm += (distOrigin - sevillaRadius) / 1000; }
+      if (!google.maps.geometry.poly.containsLocation(originMarker.getPosition(), storePolygon)) extraCost += 15;
     }
-
     if (destinationMarker) {
-      const distDestToCenter = google.maps.geometry.spherical.computeDistanceBetween(destinationMarker.getPosition(), sevillaCenterLatLng);
-      if (distDestToCenter > sevillaRadius) {
-        dentroSevilla = false;
-        extraKm += (distDestToCenter - sevillaRadius) / 1000;
-      }
+      const distDest = google.maps.geometry.spherical.computeDistanceBetween(destinationMarker.getPosition(), sevillaCenterLatLng);
+      if (distDest > sevillaRadius) { dentroSevilla = false; extraKm += (distDest - sevillaRadius) / 1000; }
     }
-
-    if (window.distanciaKm && window.distanciaKm > 0) {
-      total += window.distanciaKm * precioKm;
-    }
-
-    if (extraKm > 0) {
-      const precioExtraKm = 2.0;
-      total += extraKm * precioExtraKm;
-    }
-
+    if (window.distanciaKm && window.distanciaKm > 0) total += window.distanciaKm * precioKm;
+    if (extraKm > 0) total += extraKm * 2.0;
     total += extraCost;
-
-    // 🔴 Mínimo 35 € dentro del círculo de Sevilla
-    if (dentroSevilla && total < 35) {
-      total = 35;
-    }
-
+    if (dentroSevilla && total < 35) total = 35;
     document.getElementById('precioTotal').textContent = `Precio estimado: ${total.toFixed(2)} €`;
   }
 
   window.actualizarPrecio = actualizarPrecio;
-
-  // --- DIRECCIONES ESCRITAS ---
   document.getElementById("origen").addEventListener("change", () => geocodeAddress("origen"));
   document.getElementById("destino").addEventListener("change", () => geocodeAddress("destino"));
 
   function geocodeAddress(inputId) {
-    const address = document.getElementById(inputId).value;
-    if (!address) return;
+    const address = document.getElementById(inputId).value; if (!address) return;
     geocoder.geocode({ address: address }, (results, status) => {
       if (status === "OK" && results[0]) {
-        if (inputId === "origen") {
-          if (originMarker) originMarker.setMap(null);
-          originMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "A" });
-        } else {
-          if (destinationMarker) destinationMarker.setMap(null);
-          destinationMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "B" });
-        }
+        if (inputId === "origen") { if (originMarker) originMarker.setMap(null); originMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "A" }); }
+        else { if (destinationMarker) destinationMarker.setMap(null); destinationMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "B" }); }
         map.setCenter(results[0].geometry.location);
         if (originMarker && destinationMarker) calcularDistancia();
       }
@@ -413,95 +324,43 @@ function initMap() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const opciones = document.querySelectorAll('.option');
-  opciones.forEach(op => {
-    op.addEventListener('change', () => {
-      if (window.actualizarPrecio) window.actualizarPrecio();
-    });
-  });
+  document.querySelectorAll('.option').forEach(op => op.addEventListener('change', () => { if (window.actualizarPrecio) window.actualizarPrecio(); }));
 });
 
 function enviarSolicitud() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
-  const origen = document.getElementById('origen').value.trim();
-  const destino = document.getElementById('destino').value.trim();
-  const notas = document.getElementById('notas').value.trim();
-
-  const armarios = document.getElementById('armarios').value;
-  const cajas = document.getElementById('cajas').value;
-  const bultos = document.getElementById('bultos').value;
-  const otros = document.getElementById('otros-objetos').value.trim();
-
+  const nombre = document.getElementById('nombre').value.trim(), telefono = document.getElementById('telefono').value.trim();
+  const origen = document.getElementById('origen').value.trim(), destino = document.getElementById('destino').value.trim(), notas = document.getElementById('notas').value.trim();
+  const armarios = document.getElementById('armarios').value, cajas = document.getElementById('cajas').value, bultos = document.getElementById('bultos').value, otros = document.getElementById('otros-objetos').value.trim();
   const precio = document.getElementById('precioTotal').textContent;
-
-  if (!nombre || !telefono || !origen || !destino) {
-    alert("Por favor, completa los campos: nombre, teléfono, origen y destino.");
-    return;
-  }
-
-  let mensaje = `Presupuesto pedido por ${nombre}%0A`;
-  mensaje += `Teléfono: ${telefono}%0A`;
-  mensaje += `Origen: ${origen}%0ADestino: ${destino}%0A`;
-  mensaje += `Objetos:%0A- Armarios: ${armarios}%0A- Cajas: ${cajas}%0A- Bultos: ${bultos}%0A- Otros: ${otros || 'Ninguno'}%0A`;
-  mensaje += `Notas adicionales: ${notas || 'Ninguna'}%0A`;
-  mensaje += `${precio}%0A%0AGracias por confiar en nosotros.`;
-
-  const numeroWhatsApp = '34698373471';
-  const urlWhatsapp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
-
-  window.open(urlWhatsapp, '_blank');
+  if (!nombre || !telefono || !origen || !destino) { alert("Por favor, completa los campos obligatorios."); return; }
+  let mensaje = `Presupuesto pedido por ${nombre}%0A`; mensaje += `Teléfono: ${telefono}%0A`; mensaje += `Origen: ${origen}%0ADestino: ${destino}%0A`; mensaje += `Objetos:%0A- Armarios: ${armarios}%0A- Cajas: ${cajas}%0A- Bultos: ${bultos}%0A- Otros: ${otros || 'Ninguno'}%0A`; mensaje += `Notas: ${notas || 'Ninguna'}%0A`; mensaje += `${precio}%0A%0AGracias por confiar en nosotros.`;
+  const numeroWhatsApp = '34698373471', urlWhatsapp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
+  window.open(urlWhatsapp, '_blank'); abrirModal();
 }
+
+function abrirModal() {
+  const m = document.getElementById('modal'); if (!m) return;
+  m.style.display = 'flex'; m.setAttribute('aria-hidden','false');
+}
+function cerrarModal() {
+  const m = document.getElementById('modal'); if (!m) return;
+  m.style.display = 'none'; m.setAttribute('aria-hidden','true');
+}
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') cerrarModal(); });
+document.addEventListener('click', (e)=>{ const m = document.getElementById('modal'); if(!m || m.style.display==='none') return; if(e.target===m) cerrarModal(); });
 </script>
 
 <!-- Google Maps API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 
-
-
- <!-- Modal confirmación -->
-<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
-    <p>✅ Solicitud enviada correctamente. Revisa tu WhatsApp.</p>
-    <button onclick="cerrarModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-top:10px;">Cerrar</button>
+<!-- Modal -->
+<div id="modal" aria-hidden="true" role="dialog" aria-label="Solicitud enviada"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+  <div style="background:#fff; padding:20px; border-radius:8px; max-width:320px; width:90%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+    <p style="margin:0 0 10px; font-size:16px;">✅ Solicitud enviada correctamente.</p>
+    <p style="margin:0 0 14px; font-size:14px; color:#555;">Revisa tu WhatsApp. Te responderemos en breve.</p>
+    <button onclick="cerrarModal()" style="padding:10px 16px; background:#007BFF; color:#fff; border:none; border-radius:6px; cursor:pointer;">Cerrar</button>
   </div>
 </div>
-
-  </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
