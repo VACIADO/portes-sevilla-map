@@ -318,7 +318,7 @@
     </div>
   </div>
 
-  <script>
+ <script>
 let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer, sevillaCircle;
 window.distanciaKm = 0;
 
@@ -354,8 +354,10 @@ function initMap() {
   });
 
   // Escribir direcciones también marca en el mapa
-  document.getElementById("origen").addEventListener("change", () => geocodeAddress("origen"));
-  document.getElementById("destino").addEventListener("change", () => geocodeAddress("destino"));
+  const o = document.getElementById("origen");
+  const d = document.getElementById("destino");
+  if (o) o.addEventListener("change", () => geocodeAddress("origen"));
+  if (d) d.addEventListener("change", () => geocodeAddress("destino"));
 
   // Recalcular precio al cambiar opciones
   document.querySelectorAll('.option').forEach(op => op.addEventListener('change', actualizarPrecio));
@@ -370,13 +372,16 @@ function initMap() {
 function geocodePosition(latlng, inputId) {
   geocoder.geocode({ location: latlng }, (results, status) => {
     if (status === "OK" && results[0]) {
-      document.getElementById(inputId).value = results[0].formatted_address;
+      const inp = document.getElementById(inputId);
+      if (inp) inp.value = results[0].formatted_address;
     }
   });
 }
 
 function geocodeAddress(inputId) {
-  const address = document.getElementById(inputId).value;
+  const field = document.getElementById(inputId);
+  if (!field) return;
+  const address = field.value;
   if (!address) return;
   geocoder.geocode({ address }, (results, status) => {
     if (status === "OK" && results[0]) {
@@ -410,18 +415,25 @@ function calcularDistancia() {
   directionsService.route(request, (result, status) => {
     if (status === "OK") {
       directionsRenderer.setDirections(result);
-      const ruta = result.routes[0];
-      const distanciaMetros = ruta.legs[0].distance.value;
+      const leg = result.routes[0].legs[0];
+      const distanciaMetros = leg.distance.value;
+      const duracionSeg = leg.duration ? leg.duration.value : 0;
       window.distanciaKm = distanciaMetros / 1000;
-      document.getElementById("distanciaRuta").textContent = `Distancia de la ruta: ${window.distanciaKm.toFixed(1)} km`;
+      const distEl = document.getElementById("distanciaRuta");
+      if (distEl) distEl.textContent = `Distancia de la ruta: ${window.distanciaKm.toFixed(1)} km`;
+      const durEl = document.getElementById("duracionRuta");
+      if (durEl) durEl.textContent = `Duración estimada ruta: ${Math.round(duracionSeg/60)} min`;
       actualizarPrecio();
     } else {
-      // Fallback: distancia en línea recta (aprox.)
+      // Fallback: distancia en línea recta
       const a = originMarker.getPosition();
       const b = destinationMarker.getPosition();
       const straight = google.maps.geometry.spherical.computeDistanceBetween(a, b) / 1000;
       window.distanciaKm = straight;
-      document.getElementById("distanciaRuta").textContent = `Distancia (aprox.): ${window.distanciaKm.toFixed(1)} km`;
+      const distEl = document.getElementById("distanciaRuta");
+      if (distEl) distEl.textContent = `Distancia (aprox.): ${window.distanciaKm.toFixed(1)} km`;
+      const durEl = document.getElementById("duracionRuta");
+      if (durEl) durEl.textContent = `Duración estimada ruta: —`;
       actualizarPrecio();
     }
   });
@@ -432,13 +444,20 @@ function resetRuta(){
   if (destinationMarker) destinationMarker.setMap(null);
   originMarker = null; destinationMarker = null;
   directionsRenderer.setDirections({ routes: [] });
-  document.getElementById("origen").value = "";
-  document.getElementById("destino").value = "";
+  const o = document.getElementById("origen");
+  const d = document.getElementById("destino");
+  if (o) o.value = "";
+  if (d) d.value = "";
   window.distanciaKm = 0;
-  document.getElementById("distanciaRuta").textContent = "Distancia de la ruta: 0.0 km";
-  actualizarPrecio();
+  const distEl = document.getElementById("distanciaRuta");
+  if (distEl) distEl.textContent = "Distancia de la ruta: 0.0 km";
+  const durEl = document.getElementById("duracionRuta");
+  if (durEl) durEl.textContent = "Duración estimada ruta: 0 min";
 }
 
+// -------------------- LÓGICA DE PESO / PEONES / COSTES --------------------
+
+// Peso estimado a partir de los campos (si no hay peso manual)
 function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
@@ -447,97 +466,172 @@ function calcularPeso() {
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
 
-function recargoPorPeso(peso, aplicaPeso){
-  if (!aplicaPeso) return 0;          // Porte solo transporte no suma por peso
-  if (peso <= 200) return 0;
-  if (peso <= 500) return 20;
-  if (peso <= 800) return 40;
-  return 60; // >800 kg
+// Umbrales de peso "incluido" (sin recargo de combustible/manejo), según zona y servicio
+function getPesoIncluido(ambasDentro, tipo){
+  // tipo: 'porteSolo' | 'porteCD' | 'mudanza' | 'vaciado'
+  // Más generoso dentro del círculo; fuera, más estricto
+  if (tipo === 'porteSolo')   return ambasDentro ? 350 : 250;
+  if (tipo === 'porteCD')     return ambasDentro ? 250 : 200;
+  if (tipo === 'mudanza')     return ambasDentro ? 200 : 150;
+  if (tipo === 'vaciado')     return ambasDentro ? 220 : 170;
+  return ambasDentro ? 250 : 200;
+}
+
+// Incremento €/km por combustible SOLO si (peso > incluido)
+function kmRateExtraPorExceso(excesoKg){
+  if (excesoKg <= 0) return 0;
+  if (excesoKg <= 200) return 0.10; // +0,10 €/km
+  if (excesoKg <= 400) return 0.20; // +0,20 €/km
+  return 0.35;                      // +0,35 €/km
+}
+
+// Extra fijo por combustible SOLO si (peso > incluido)
+function extraFijoPorExceso(excesoKg){
+  if (excesoKg <= 0) return 0;
+  if (excesoKg <= 300) return 5;
+  if (excesoKg <= 600) return 12;
+  return 20;
+}
+
+// Recargo de MANEJO por peso SOLO si (peso > incluido) y el servicio requiere manejo
+function recargoManejoPorExceso(excesoKg){
+  if (excesoKg <= 0) return 0;
+  if (excesoKg <= 300) return 20;
+  if (excesoKg <= 600) return 40;
+  return 60;
+}
+
+// Estimación de tiempo de manejo (carga+descarga) en minutos
+function estimarMinutosManejo(){
+  const g = id => parseInt(document.getElementById(id)?.value) || 0;
+  const min = g('cajas')*3 + g('bultos')*4 + g('armarios')*10 + g('sofas')*8 + g('camaMatrimonio')*12 + g('camaIndividual')*10;
+  return Math.max(min, (min>0 ? 15 : 0)); // mínimo si hay algo que mover
+}
+
+// Número de peones recomendados si hay manejo (en función de peso/volumen)
+function peonesRecomendados(peso){
+  const g = id => parseInt(document.getElementById(id)?.value) || 0;
+  const voluminosos = g('sofas') + g('camaMatrimonio') + g('camaIndividual') + g('armarios');
+  if (peso > 450 || voluminosos >= 2) return 2;
+  return 1;
 }
 
 function actualizarPrecio() {
-  // Qué servicios han marcado
-  const isPorteSolo = document.getElementById('optPorte')?.checked || false;
-  const isPorteCD   = document.getElementById('optPorteCD')?.checked || false;
-  const isMudanza   = document.getElementById('optMudanza')?.checked || false;
-  const isVaciadoP  = document.getElementById('optVaciadoPiso')?.checked || false;
-  const isVaciadoN  = document.getElementById('optVaciadoNave')?.checked || false;
+  // Servicios seleccionados
+  const sel = Array.from(document.querySelectorAll('.option'))
+    .filter(op => op.checked)
+    .map(op => (op.dataset.name||'').toLowerCase());
 
-  // Base por opciones (sin mostrar precios en el formulario)
+  const isPorteSolo   = sel.includes('porte (solo transporte)') || sel.includes('porte local (ayuda pie de calle)'); // compatibilidad
+  const isPorteCD     = sel.includes('porte con carga y descarga') || sel.includes('carga y descarga adicional');
+  const isMudanza     = sel.includes('mudanza pequeña');
+  const isVaciado     = sel.includes('vaciado de piso') || sel.includes('vaciado de nave');
+
+  // Base servicios (NO mostramos precios junto a las casillas del formulario)
   let base = 0;
-  document.querySelectorAll('.option').forEach(op => {
-    if (op.checked) base += parseFloat(op.dataset.price) || 0;
-  });
+  document.querySelectorAll('.option').forEach(op => { if (op.checked) base += parseFloat(op.dataset.price)||0; });
 
-  // Tarifa km
-  let kmRate = 1.2; // fuera
+  // Zona (tarifa por km base)
+  let kmRateBase = 1.2; // fuera de Sevilla
   let ambasDentro = false;
   if (originMarker && destinationMarker) {
     const dentroA = insideSevilla(originMarker.getPosition());
     const dentroB = insideSevilla(destinationMarker.getPosition());
     ambasDentro = (dentroA && dentroB);
-    if (ambasDentro) kmRate = 0.9;
+    if (ambasDentro) kmRateBase = 0.9;
   }
-  let kmCost = 0;
-  if (window.distanciaKm > 0) kmCost = window.distanciaKm * kmRate;
 
-  // Peso
+  const km = Math.max(0, window.distanciaKm || 0);
   const peso = calcularPeso();
 
-  // El recargo por peso SOLO aplica si hay servicios con carga/descarga
-  const aplicaPeso = (isPorteCD || isMudanza || isVaciadoP || isVaciadoN);
-  const pesoCost = recargoPorPeso(peso, aplicaPeso);
+  // Determinar tipo principal para umbral
+  let tipo = 'porteSolo';
+  if (isMudanza) tipo = 'mudanza';
+  else if (isVaciado) tipo = 'vaciado';
+  else if (isPorteCD) tipo = 'porteCD';
+  else if (isPorteSolo) tipo = 'porteSolo';
 
-  // Peón automático: solo cuando aplicaPeso = true
-  let peonAuto = 0;
-  if (aplicaPeso) {
-    if (peso >= 700) peonAuto = 50;       // 2 peones
-    else if (peso >= 400) peonAuto = 25;  // 1 peón
+  // Peso incluido sin recargo
+  const pesoIncluido = getPesoIncluido(ambasDentro, tipo);
+  const excesoKg = Math.max(0, peso - pesoIncluido);
+
+  // Ajustes por combustible (aplican también en porte solo) SOLO si hay exceso
+  const kmExtra = kmRateExtraPorExceso(excesoKg);
+  const fijoComb = extraFijoPorExceso(excesoKg);
+
+  // Coste por km total
+  const kmRate = kmRateBase + kmExtra;
+  const kmCost = km * kmRate;
+
+  // Manejo: solo en porte+CyD, mudanza o vaciado
+  const manejoRequerido = (isPorteCD || isMudanza || isVaciado);
+  let manejoPeso = 0, peones = 0, minManejo = 0, costePeones = 0;
+
+  if (manejoRequerido){
+    // Recargo por manejo SOLO por exceso
+    manejoPeso = recargoManejoPorExceso(excesoKg);
+    minManejo = estimarMinutosManejo();
+    peones = peonesRecomendados(peso);
+    const tarifaPeonHora = 18; // €/h por peón
+    const horas = minManejo / 60;
+    costePeones = peones * tarifaPeonHora * horas;
   }
 
-  let total = base + kmCost + pesoCost + peonAuto;
+  // Total
+  let total = base + kmCost + fijoComb + manejoPeso + costePeones;
 
-  // Mínimo solo para Porte (solo transporte) dentro de Sevilla
-  if (isPorteSolo && !isPorteCD && !isMudanza && !isVaciadoP && !isVaciadoN && ambasDentro && total < 35) {
-    total = 35;
-  }
+  // Mínimo en Sevilla capital (rutas cortas y servicios básicos)
+  if (ambasDentro && total < 35) total = 35;
 
-  // Pintar UI
-  document.getElementById("pesoTotal").textContent = `Peso estimado: ${peso} kg`;
-  document.getElementById("precioTotal").textContent = `Precio estimado: ${total.toFixed(2)} €`;
+  // UI
+  const pesoEl = document.getElementById("pesoTotal");
+  if (pesoEl) pesoEl.textContent = `Peso estimado: ${peso} kg`;
+  const precioEl = document.getElementById("precioTotal");
+  if (precioEl) precioEl.textContent = `Precio estimado: ${total.toFixed(2)} €`;
 
-  const desglose = [
+  const desgloseTxt = [
     `Base servicios: ${base.toFixed(2)} €`,
-    `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
-    `Recargo por peso: ${pesoCost.toFixed(2)} €`,
-    peonAuto ? `Peón automático: ${peonAuto.toFixed(2)} €` : null,
-    (isPorteSolo && ambasDentro) ? `Mínimo Sevilla capital aplicado si procede` : null
+    `Km (${kmRate.toFixed(2)} €/km): ${kmCost.toFixed(2)} €`,
+    fijoComb ? `Extra combustible (exceso ${excesoKg} kg): ${fijoComb.toFixed(2)} €` : null,
+    (manejoRequerido && manejoPeso) ? `Manejo por exceso: ${manejoPeso.toFixed(2)} €` : null,
+    (manejoRequerido && costePeones) ? `Peones (${peones}) · ${Math.round(minManejo)} min: ${costePeones.toFixed(2)} €` : null,
+    ambasDentro ? `Mínimo Sevilla capital aplicado si procede` : null
   ].filter(Boolean).join(" · ");
+  const desg = document.getElementById("desglose");
+  if (desg) desg.textContent = desgloseTxt;
 
-  document.getElementById("desglose").textContent = desglose;
+  const man = document.getElementById("manejo");
+  if (man) man.textContent = manejoRequerido ? `Carga/descarga: ${Math.round(minManejo)} min · Peones: ${peones}` : `Carga/descarga: — · Peones: —`;
 }
 
 function enviarSolicitud() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
-  const origen = document.getElementById('origen').value.trim();
-  const destino = document.getElementById('destino').value.trim();
-  const notas = document.getElementById('notas').value.trim();
+  const nombre = document.getElementById('nombre')?.value.trim() || "";
+  const telefono = document.getElementById('telefono')?.value.trim() || "";
+  const origen = document.getElementById('origen')?.value.trim() || "";
+  const destino = document.getElementById('destino')?.value.trim() || "";
+  const notas = document.getElementById('notas')?.value.trim() || "";
 
   if (!nombre || !telefono || !origen || !destino) {
     alert("Por favor, completa nombre, WhatsApp, origen y destino.");
     return;
   }
 
-  const precio = document.getElementById('precioTotal').textContent;
-  const peso = document.getElementById('pesoTotal').textContent;
-  const distancia = document.getElementById('distanciaRuta').textContent;
+  const precio = document.getElementById('precioTotal')?.textContent || "";
+  const peso = document.getElementById('pesoTotal')?.textContent || "";
+  const distancia = document.getElementById('distanciaRuta')?.textContent || "";
+  const duracion = document.getElementById('duracionRuta')?.textContent || "";
+  const manejo = document.getElementById('manejo')?.textContent || "";
 
   let mensaje = `Presupuesto pedido por ${nombre}%0A`;
   mensaje += `Teléfono: ${telefono}%0A`;
   mensaje += `Origen: ${origen}%0ADestino: ${destino}%0A`;
-  mensaje += `${distancia}%0A${peso}%0A${precio}%0A`;
+  if (distancia) mensaje += `${distancia}%0A`;
+  if (duracion)  mensaje += `${duracion}%0A`;
+  if (peso)      mensaje += `${peso}%0A`;
+  if (manejo)    mensaje += `${manejo}%0A`;
+  if (precio)    mensaje += `${precio}%0A`;
   mensaje += `Notas: ${notas || 'Ninguna'}%0A`;
+  mensaje += `⚠️ Precio orientativo; se confirma en el presupuesto oficial según tiempo y peso.`;
 
   const numeroWhatsApp = '34698373471';
   const urlWhatsapp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
@@ -546,13 +640,15 @@ function enviarSolicitud() {
   abrirModal();
 }
 
+// Modal
 function abrirModal(){ const m=document.getElementById('modal'); if(!m) return; m.style.display='flex'; m.setAttribute('aria-hidden','false'); }
 function cerrarModal(){ const m=document.getElementById('modal'); if(!m) return; m.style.display='none'; m.setAttribute('aria-hidden','true'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarModal(); });
 document.addEventListener('click', e=>{ const m=document.getElementById('modal'); if(!m||m.style.display==='none') return; if(e.target===m) cerrarModal(); });
-  </script>
+</script>
 
   <!-- Google Maps API (incluye geometry para el círculo y la distancia) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 </body>
 </html>
+
