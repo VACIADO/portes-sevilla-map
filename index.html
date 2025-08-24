@@ -13,84 +13,66 @@
       --text:#222;
       --sub:#555;
     }
-    html, body {
-      margin: 0; padding: 0; overflow-x: hidden;
-      font-family: Arial, sans-serif; background-color: var(--muted); color: var(--text);
-    }
+    html, body { margin:0; padding:0; overflow-x:hidden; font-family: Arial, sans-serif; background:var(--muted); color:var(--text); }
     *, *:before, *:after { box-sizing: border-box; }
-    .container {
-      max-width: 900px; width: 95%; margin: 18px auto;
-      background: var(--card); padding: 20px; border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    }
-    h1, h2 { text-align: center; margin: 10px 0 12px; }
+    .container { max-width: 900px; width: 95%; margin: 18px auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    h1, h2 { text-align:center; margin: 10px 0 12px; }
     p { line-height: 1.5; }
-    ul { font-size: 16px; line-height: 1.6; margin: 0 0 14px; padding-left: 18px; }
-    table {
-      width: 100%; border-collapse: collapse; font-size: 16px; margin: 10px 0 20px;
-      border-radius: 10px; overflow: hidden;
-    }
-    table th, table td { padding: 10px; text-align: center; }
-    thead th { background: #f0f4ff; }
+    ul { font-size:16px; line-height:1.6; margin:0 0 14px; padding-left:18px; }
+    table { width:100%; border-collapse: collapse; font-size:16px; margin:10px 0 20px; border-radius:10px; overflow:hidden; }
+    table th, table td { padding:10px; text-align:center; }
+    thead th { background:#f0f4ff; }
     tbody tr:nth-child(odd){ background:#fafafa;}
-    input, textarea, select {
-      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background:#fff;
-    }
-    label { display:block; margin-bottom: 10px; font-size: 15px; }
+    input, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; background:#fff; }
+    label { display:block; margin-bottom: 10px; font-size:15px; }
     .check { display:flex; align-items:center; gap:10px; margin:6px 0; }
     .check input[type="checkbox"]{ width:18px; height:18px; }
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
     .grid-3 { display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
-    .grid-3 label, .grid-2 label {
-      background:#fafafa; border:1px solid #eee; border-radius:10px; padding:10px;
-    }
-    button {
-      background-color: var(--primary); color: white; padding: 12px 16px; border: none;
-      border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%;
-      transition: filter .2s;
-    }
-    button:hover { filter: brightness(.95); }
-    .btn-wa { background: var(--accent); display:inline-block; text-decoration:none; text-align:center; }
-    #resultado { font-size: 16px; font-weight: 600; color: #0a7a24; margin-top: 8px; text-align:center; }
+    .grid-3 label, .grid-2 label { background:#fafafa; border:1px solid #eee; border-radius:10px; padding:10px; }
+    button { background:var(--primary); color:#fff; padding:12px 16px; border:none; border-radius:8px; cursor:pointer; font-size:16px; width:100%; transition: filter .2s; }
+    button:hover { filter:brightness(.95); }
+    .btn-wa { background:var(--accent); display:inline-block; text-decoration:none; text-align:center; padding:12px 16px; border-radius:8px; color:#fff; }
+    #resultado { font-size:16px; font-weight:600; color:#0a7a24; margin-top:8px; text-align:center; }
     .kpis { display:grid; grid-template-columns: 1fr; gap:8px; margin:12px 0 10px; }
     .kpi { text-align:center; padding:10px; background:#f9fbff; border:1px solid #eaf1ff; border-radius:10px; font-weight:700; color:var(--primary); }
-    #map { height: 360px; width: 100%; border-radius: 12px; margin-bottom: 10px; }
-    #map-instruction { font-size: 15px; color: var(--sub); text-align: center; margin-bottom: 16px; }
-    .aviso { font-size: 16px; color: #b55a00; font-weight: bold; text-align: center; margin: 8px 0 18px; }
-    .aviso span { color: #0e8f3a; }
-    .banner {
-      background:#ffe9b3; padding:16px; border-radius:10px; margin:18px 0;
-      text-align:center; font-size:18px; font-weight:bold; color:#4b4b4b;
-      border:1px dashed #f2c66d;
-    }
+    #map { height: 360px; width: 100%; border-radius: 12px; margin-bottom: 8px; }
+    #map-instruction { font-size: 15px; color: var(--sub); text-align: center; margin-bottom: 10px; }
+    .legend { font-size:13px; color:#333; text-align:center; margin-bottom:14px; }
+    .aviso { font-size:16px; color:#b55a00; font-weight:700; text-align:center; margin:8px 0 18px; }
+    .aviso span { color:#0e8f3a; }
+    .banner { background:#ffe9b3; padding:16px; border-radius:10px; margin:18px 0; text-align:center; font-size:18px; font-weight:bold; color:#4b4b4b; border:1px dashed #f2c66d; }
     .banner span { color:#c0392b; }
-    /* Tarjetas de servicios pintura + impermeabilización */
     .cards { display:grid; grid-template-columns: 1fr; gap:14px; margin: 12px 0 6px; }
-    .card {
-      border:1px solid #eee; border-radius:12px; overflow:hidden; background:#fff;
-      display:grid; grid-template-columns: 110px 1fr; gap:12px; align-items: center;
-    }
-    .card img { width:110px; height:100%; object-fit: cover; display:block; }
+    .card { border:1px solid #eee; border-radius:12px; overflow:hidden; background:#fff; display:grid; grid-template-columns: 110px 1fr; gap:12px; align-items:center; }
+    .card img { width:110px; height:100%; object-fit:cover; display:block; }
     .card-body { padding:10px 12px; }
-    .card-title { font-weight: 700; margin: 0 0 6px; }
+    .card-title { font-weight:700; margin:0 0 6px; }
     .card-text { margin:0; color:#444; font-size:14px; }
     .badge { display:inline-block; background:#eaf8ec; color:#0e8f3a; border:1px solid #cdeed2; padding:4px 8px; border-radius:999px; font-size:12px; margin-top:6px;}
     .cta-inline { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
     .muted { color:#777; font-size:14px; text-align:center; margin:6px 0 0; }
-    /* Modal (TU ESTILO EXACTO) */
-    #modal {
-      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;
-    }
-    .modal-box {
-      background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;
-      box-shadow:0 10px 30px rgba(0,0,0,0.25);
-    }
-    /* Responsive */
+
+    /* Footer */
+    footer { background:#0d1b2a; color:#fff; margin-top:24px; padding:22px 0 28px; }
+    .footer-inner { max-width:900px; width:95%; margin:0 auto; display:grid; gap:16px; }
+    .foot-grid { display:grid; grid-template-columns: 1fr; gap:16px; }
+    .foot-col h4 { margin:0 0 8px; font-size:16px; }
+    .foot-col p, .foot-col a { font-size:14px; color:#e6f1ff; text-decoration:none; }
+    .foot-col a:hover { text-decoration:underline; }
+    .foot-cta { display:flex; gap:10px; flex-wrap:wrap; }
+    .foot-cta a { background:#25D366; color:#0d1b2a; padding:10px 14px; border-radius:8px; font-weight:700; text-decoration:none; }
+    .copy { text-align:center; font-size:12px; color:#bcd1ff; margin-top:6px; }
+
+    /* Modal */
+    #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
+    .modal-box { background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.25); }
+
     @media (min-width:560px){
       .kpis{ grid-template-columns: repeat(3,1fr); }
       .cards{ grid-template-columns: 1fr 1fr; }
       .grid-3{ grid-template-columns: repeat(3,1fr); }
+      .foot-grid{ grid-template-columns: 1fr 1fr 1fr; }
     }
   </style>
 </head>
@@ -130,8 +112,9 @@
 
     <h2>🎨 Pintura e Impermeabilización</h2>
     <div class="cards">
+      <!-- Imágenes siempre visibles (placeholders). Cámbialas luego por fotos reales -->
       <div class="card">
-        <img src="https://source.unsplash.com/featured/?roof,waterproofing" alt="Impermeabilización de azotea">
+        <img src="https://placehold.co/300x200?text=Impermeabilizacion+Azotea" alt="Impermeabilización de azotea">
         <div class="card-body">
           <p class="card-title">Impermeabilización de Azoteas</p>
           <p class="card-text">Sellado de juntas, lámina líquida y reparaciones. Trabajo garantizado.</p>
@@ -139,7 +122,7 @@
         </div>
       </div>
       <div class="card">
-        <img src="https://source.unsplash.com/featured/?interior,painting" alt="Pintura de vivienda">
+        <img src="https://placehold.co/300x200?text=Pintura+Vivienda" alt="Pintura de vivienda">
         <div class="card-body">
           <p class="card-title">Pintura de Viviendas</p>
           <p class="card-text">Pisos, trasteros y naves. Acabado limpio y rápido.</p>
@@ -147,7 +130,7 @@
         </div>
       </div>
       <div class="card">
-        <img src="https://source.unsplash.com/featured/?warehouse,epoxy,floor" alt="Pintura de naves y suelos epoxi">
+        <img src="https://placehold.co/300x200?text=Pintura+de+Naves" alt="Pintura de naves y suelos epoxi">
         <div class="card-body">
           <p class="card-title">Pintura de Naves</p>
           <p class="card-text">Suelos epoxi, paredes y techos. Protección y estética.</p>
@@ -155,7 +138,7 @@
         </div>
       </div>
       <div class="card">
-        <img src="https://source.unsplash.com/featured/?sealant,caulking" alt="Sellado y humedades">
+        <img src="https://placehold.co/300x200?text=Sellado+Humedades" alt="Sellado y humedades">
         <div class="card-body">
           <p class="card-title">Sellado y Humedades</p>
           <p class="card-text">Tratamiento de filtraciones y grietas. Soluciones duraderas.</p>
@@ -172,6 +155,7 @@
     <h2>📍 Marca tu ruta en el mapa</h2>
     <div id="map"></div>
     <p id="map-instruction">Toca en el mapa o escribe direcciones para marcar origen y destino.</p>
+    <p class="legend">Zona azul = <strong>Sevilla Capital (tarifa reducida)</strong>. Km a 0,9 €/km dentro del círculo, 1,2 €/km fuera.</p>
 
     <h2>💬 Calcula tu presupuesto</h2>
     <div style="border:1px solid #eaeaea; padding:15px; border-radius:12px;">
@@ -243,52 +227,75 @@
 
       <button onclick="enviarSolicitud()">Solicitar Presupuesto</button>
       <p id="resultado"></p>
-      <p class="muted">⚠️ Recuerde: el precio mostrado es estimado. El precio final se confirma en el presupuesto oficial según tiempo de carga/descarga y peso/volumen.</p>
+      <p class="muted">⚠️ El precio mostrado es estimado. El precio final se confirma en el presupuesto oficial según tiempo de carga/descarga y peso/volumen.</p>
     </div>
-
-    <h2>📞 Contacto</h2>
-    <p style="text-align:center">
-      📞 WhatsApp: <a href="https://wa.me/34698373471">698 373 471</a> ·
-      📧 Email: <a href="mailto:portemudanzayvaciadoprosevilla@gmail.com">portemudanzayvaciadoprosevilla@gmail.com</a>
-    </p>
   </div>
 
-  <!-- Modal confirmación (tu estilo exacto) -->
+  <!-- Footer completo -->
+  <footer>
+    <div class="footer-inner">
+      <div class="foot-grid">
+        <div class="foot-col">
+          <h4>Contacto</h4>
+          <p>📞 <a href="https://wa.me/34698373471">WhatsApp: 698 373 471</a></p>
+          <p>📧 <a href="mailto:portemudanzayvaciadoprosevilla@gmail.com">portemudanzayvaciadoprosevilla@gmail.com</a></p>
+          <p>📷 <a href="https://www.instagram.com/portemudanzayvaciadoprosevilla" target="_blank">@portemudanzayvaciadoprosevilla</a></p>
+        </div>
+        <div class="foot-col">
+          <h4>Horario</h4>
+          <p>Lunes a Sábado · 8:00–21:00</p>
+          <p>Domingos y urgencias: consultar</p>
+        </div>
+        <div class="foot-col">
+          <h4>Zonas</h4>
+          <p>Sevilla Capital, Aljarafe, Dos Hermanas, Alcalá de Guadaíra, San José, Camas…</p>
+          <div class="foot-cta"><a href="https://wa.me/34698373471">💬 Escríbenos por WhatsApp</a></div>
+        </div>
+      </div>
+      <p class="copy">© 2025 Porte, Mudanza y Vaciado Pro · Sevilla</p>
+    </div>
+  </footer>
+
+  <!-- Modal confirmación (tu estilo) -->
   <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
     <div class="modal-box">
       <p style="margin:0 0 8px; font-size:16px;">✅ Solicitud enviada correctamente. Revisa tu WhatsApp.</p>
-      <button onclick="cerrarModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-top:10px;">
-        Cerrar
-      </button>
+      <button onclick="cerrarModal()" style="padding:8px 16px; background:#007BFF; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-top:10px;">Cerrar</button>
     </div>
   </div>
 
   <!-- LÓGICA -->
   <script>
-let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer;
+let map, originMarker, destinationMarker, geocoder, directionsService, directionsRenderer, sevillaCircle;
 window.distanciaKm = 0;
 
+const SEVILLA_CENTER = { lat: 37.3980, lng: -5.9650 };
+const SEVILLA_RADIUS_M = 6500; // 6,5 km
+
 function initMap() {
-  console.log("[init] Cargando mapa…");
-  const sevillaCenter = { lat: 37.3980, lng: -5.9650 };
-  map = new google.maps.Map(document.getElementById("map"), { center: sevillaCenter, zoom: 12 });
+  console.log("[init] Mapa listo");
+  map = new google.maps.Map(document.getElementById("map"), { center: SEVILLA_CENTER, zoom: 12 });
   geocoder = new google.maps.Geocoder();
   directionsService = new google.maps.DirectionsService();
   directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
+  // 🔵 Círculo Sevilla Capital (tarifa reducida)
+  sevillaCircle = new google.maps.Circle({
+    strokeColor: '#007BFF', strokeOpacity: 0.8, strokeWeight: 2,
+    fillColor: '#007BFF', fillOpacity: 0.15, map, center: SEVILLA_CENTER,
+    radius: SEVILLA_RADIUS_M, clickable: false
+  });
+
   // Click en mapa: A -> B -> reset
   map.addListener("click", (e) => {
     if (!originMarker) {
-      originMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "A" });
+      originMarker = new google.maps.Marker({ position: e.latLng, map, label: "A" });
       geocodePosition(e.latLng, "origen");
-      console.log("[map] Origen marcado");
     } else if (!destinationMarker) {
-      destinationMarker = new google.maps.Marker({ position: e.latLng, map: map, label: "B" });
+      destinationMarker = new google.maps.Marker({ position: e.latLng, map, label: "B" });
       geocodePosition(e.latLng, "destino");
-      console.log("[map] Destino marcado");
       calcularDistancia();
     } else {
-      console.log("[map] Reset ruta");
       resetRuta();
     }
     actualizarPrecio();
@@ -303,7 +310,8 @@ function initMap() {
 
   // Recalcular peso si cambian cantidades o peso manual
   ["armarios","cajas","bultos","sofas","camaMatrimonio","camaIndividual","pesoManual"].forEach(id=>{
-    document.getElementById(id).addEventListener('input', actualizarPrecio);
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', actualizarPrecio);
   });
 }
 
@@ -318,19 +326,26 @@ function geocodePosition(latlng, inputId) {
 function geocodeAddress(inputId) {
   const address = document.getElementById(inputId).value;
   if (!address) return;
-  geocoder.geocode({ address: address }, (results, status) => {
+  geocoder.geocode({ address }, (results, status) => {
     if (status === "OK" && results[0]) {
       if (inputId === "origen") {
         if (originMarker) originMarker.setMap(null);
-        originMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "A" });
+        originMarker = new google.maps.Marker({ position: results[0].geometry.location, map, label: "A" });
       } else {
         if (destinationMarker) destinationMarker.setMap(null);
-        destinationMarker = new google.maps.Marker({ position: results[0].geometry.location, map: map, label: "B" });
+        destinationMarker = new google.maps.Marker({ position: results[0].geometry.location, map, label: "B" });
       }
       map.setCenter(results[0].geometry.location);
       if (originMarker && destinationMarker) calcularDistancia();
+      actualizarPrecio();
     }
   });
+}
+
+function insideSevilla(latLng){
+  const center = new google.maps.LatLng(SEVILLA_CENTER.lat, SEVILLA_CENTER.lng);
+  const dist = google.maps.geometry.spherical.computeDistanceBetween(latLng, center);
+  return dist <= SEVILLA_RADIUS_M;
 }
 
 function calcularDistancia() {
@@ -347,10 +362,16 @@ function calcularDistancia() {
       const distanciaMetros = ruta.legs[0].distance.value;
       window.distanciaKm = distanciaMetros / 1000;
       document.getElementById("distanciaRuta").textContent = `Distancia de la ruta: ${window.distanciaKm.toFixed(1)} km`;
-      console.log("[ruta] Distancia:", window.distanciaKm.toFixed(1), "km");
       actualizarPrecio();
     } else {
-      console.warn("[ruta] Error al calcular:", status);
+      // Fallback: distancia en línea recta (aprox.)
+      const a = originMarker.getPosition();
+      const b = destinationMarker.getPosition();
+      const straight = google.maps.geometry.spherical.computeDistanceBetween(a, b) / 1000;
+      window.distanciaKm = straight;
+      document.getElementById("distanciaRuta").textContent = `Distancia (aprox.): ${window.distanciaKm.toFixed(1)} km`;
+      console.warn("[ruta] Fallback a distancia aproximada:", status);
+      actualizarPrecio();
     }
   });
 }
@@ -363,40 +384,38 @@ function resetRuta(){
   document.getElementById("origen").value = "";
   document.getElementById("destino").value = "";
   window.distanciaKm = 0;
-  document.getElementById("distanciaRuta").textContent = `Distancia de la ruta: 0.0 km`;
+  document.getElementById("distanciaRuta").textContent = "Distancia de la ruta: 0.0 km";
+  actualizarPrecio();
 }
 
 function calcularPeso() {
-  const n = id => parseInt(document.getElementById(id).value) || 0;
-  const manual = parseInt(document.getElementById('pesoManual').value) || 0;
+  const n = id => parseInt(document.getElementById(id)?.value) || 0;
+  const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
-
-  // Pesos estimados por unidad
-  const armarios = n('armarios') * 60;
-  const cajas = n('cajas') * 15;
-  const bultos = n('bultos') * 20;
-  const sofas = n('sofas') * 50;
-  const camaMatrimonio = n('camaMatrimonio') * 80;
-  const camaIndividual = n('camaIndividual') * 50;
-
-  const total = armarios + cajas + bultos + sofas + camaMatrimonio + camaIndividual;
-  return total;
+  return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
 
 function actualizarPrecio() {
-  // Base por servicios marcados
   let total = 0;
   document.querySelectorAll('.option').forEach(op => {
     if (op.checked) total += parseFloat(op.dataset.price) || 0;
   });
 
-  // Distancia
-  if (window.distanciaKm > 0) total += window.distanciaKm * 1.2;
+  // Tarifa km según si A y B están dentro del círculo
+  let kmRate = 1.2; // fuera
+  let ambasDentro = false;
+  if (originMarker && destinationMarker) {
+    const dentroA = insideSevilla(originMarker.getPosition());
+    const dentroB = insideSevilla(destinationMarker.getPosition());
+    ambasDentro = (dentroA && dentroB);
+    if (ambasDentro) kmRate = 0.9;
+  }
 
-  // Mínimo dentro de Sevilla (si no hay rutas, se mantiene mínimo)
-  if (total < 35) total = 35;
+  if (window.distanciaKm > 0) total += window.distanciaKm * kmRate;
 
-  // Peso (informativo)
+  // Mínimo en Sevilla capital
+  if (ambasDentro && total < 35) total = 35;
+
   const peso = calcularPeso();
   document.getElementById("pesoTotal").textContent = `Peso estimado: ${peso} kg`;
   document.getElementById("precioTotal").textContent = `Precio estimado: ${total.toFixed(2)} €`;
@@ -437,7 +456,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarModal(); })
 document.addEventListener('click', e=>{ const m=document.getElementById('modal'); if(!m||m.style.display==='none') return; if(e.target===m) cerrarModal(); });
   </script>
 
-  <!-- Google Maps API -->
+  <!-- Google Maps API (incluye geometry para el círculo y la distancia) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 </body>
 </html>
