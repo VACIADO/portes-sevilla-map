@@ -332,6 +332,14 @@ const BASES = {
   mudanza_comp: 140
 };
 
+// Para pintar "desde X €" al lado de cada nivel sin tocar el HTML
+const NIVEL_HINTS = {
+  'porte local (ayuda pie de calle)': ` (desde ${BASES.porte} €)`,
+  'carga y descarga': ` (desde ${BASES.porte_cyd} €)`,
+  'mudanza pequeña': ` (desde ${BASES.mudanza_peq} €)`,
+  'mudanza completa': ` (desde ${BASES.mudanza_comp} €)`
+};
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), { center: SEVILLA_CENTER, zoom: 12 });
   geocoder = new google.maps.Geocoder();
@@ -371,6 +379,30 @@ function initMap() {
   ["armarios","cajas","bultos","sofas","camaMatrimonio","camaIndividual","pesoManual"].forEach(id=>{
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', actualizarPrecio);
+  });
+
+  // Pinta hints "(desde X €)" al lado de cada nivel
+  pintarHintsNiveles();
+}
+
+function pintarHintsNiveles(){
+  document.querySelectorAll('.option').forEach(op=>{
+    const name = (op.dataset.name || '').toLowerCase();
+    const label = op.closest('label');
+    if (!label) return;
+    for (const key in NIVEL_HINTS){
+      if (name.includes(key)){
+        // evita duplicados
+        if (!label.querySelector('.nivel-hint')){
+          const s = document.createElement('span');
+          s.className = 'nivel-hint';
+          s.style.color = '#555';
+          s.style.fontSize = '13px';
+          s.textContent = NIVEL_HINTS[key];
+          label.appendChild(s);
+        }
+      }
+    }
   });
 }
 
@@ -461,6 +493,7 @@ function getTier(){
   const mudPeq    = hasOption('mudanza pequeña');
   const mudComp   = hasOption('mudanza completa');
 
+  // Prioridad: mudanza completa > mudanza pequeña > porte + C/D > porte
   if (mudComp) return 'mudanza_comp';
   if (mudPeq)   return 'mudanza_peq';
   if (porte && carga) return 'porte_cyd';
@@ -473,14 +506,27 @@ function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
+  // Pesos estimados por unidad
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
+
 function recargoPorPeso(peso, tier){
+  // Solo suma si NO es porte simple
   if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
   if (peso <= 200) return 0;
   if (peso <= 500) return 20;
   if (peso <= 800) return 40;
-  return 60;
+  return 60; // >800 kg
+}
+
+// Peón por objetos pesados: 1 peón si >=1 pesado; 2 peones si >=3 pesados
+function peonPorObjetos(tier){
+  if (!(tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp')) return 0;
+  const n = id => parseInt(document.getElementById(id)?.value) || 0;
+  const pesados = n('sofas') + n('armarios') + n('camaMatrimonio');
+  if (pesados >= 3) return 50;     // 2 peones sugeridos
+  if (pesados >= 1) return 25;     // 1 peón sugerido
+  return 0;
 }
 
 /* ===== PRECIO TOTAL ===== */
@@ -488,7 +534,7 @@ function actualizarPrecio() {
   const tier = getTier();
   const peso = calcularPeso();
 
-  // Base por nivel (no sumamos niveles)
+  // Base por nivel (no sumamos niveles entre sí)
   let base = 0;
   if (tier) base = BASES[tier];
 
@@ -514,17 +560,13 @@ function actualizarPrecio() {
   // Peso (solo si C/D o mudanza)
   const pesoCost = recargoPorPeso(peso, tier);
 
-  // Peón sugerido
-  let peonAuto = 0;
-  if (tier==='porte_cyd' || tier==='mudanza_peq' || tier==='mudanza_comp') {
-    if (peso >= 350 && peso < 650) peonAuto = 25;
-    else if (peso >= 650)          peonAuto = 50;
-  }
+  // Peón sugerido por objetos pesados
+  const peonAuto = peonPorObjetos(tier);
 
   let total = base + extras + kmCost + pesoCost + peonAuto;
 
-  // Mínimo en Sevilla capital si hay nivel seleccionado
-  if (tier && ambasDentro && total < 35) total = 35;
+  // Mínimo 35 € si ambas direcciones dentro de Sevilla y el nivel es porte
+  if (tier==='porte' && ambasDentro && total < 35) total = 35;
 
   // UI
   const pesoEl = document.getElementById("pesoTotal");
@@ -533,8 +575,9 @@ function actualizarPrecio() {
   if (precioEl) precioEl.textContent = `Precio estimado: ${total.toFixed(2)} €`;
   const desg = document.getElementById("desglose");
   if (desg) {
+    const tierTxt = tier ? tier.replace('_',' ').toUpperCase() : 'sin seleccionar';
     const partes = [
-      `Nivel: ${tier ? tier.replace('_',' ').toUpperCase() : 'sin seleccionar'} (${base.toFixed(2)} €)`,
+      `Nivel: ${tierTxt} (${base.toFixed(2)} €)`,
       `Extras: ${extras.toFixed(2)} €`,
       `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
     ];
@@ -578,9 +621,11 @@ function abrirModal(){ const m=document.getElementById('modal'); if(!m) return; 
 function cerrarModal(){ const m=document.getElementById('modal'); if(!m) return; m.style.display='none'; m.setAttribute('aria-hidden','true'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarModal(); });
 document.addEventListener('click', e=>{ const m=document.getElementById('modal'); if(!m||m.style.display==='none') return; if(e.target===m) cerrarModal(); });
-  </script>
+</script>
+
 
   <!-- Google Maps API (incluye geometry para el círculo y la distancia) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVPHqQDXL4vVijvq2vg3KeGKwgR-VDgu8&libraries=geometry&callback=initMap" async defer></script>
 </body>
 </html>
+
