@@ -12,6 +12,7 @@
       --card:#ffffff;
       --text:#222;
       --sub:#555;
+      --line:#eee;
     }
     html, body { margin:0; padding:0; overflow-x:hidden; font-family: Arial, sans-serif; background:var(--muted); color:var(--text); }
     *, *:before, *:after { box-sizing: border-box; }
@@ -20,10 +21,10 @@
     p { line-height: 1.5; }
 
     /* Lista de servicios con precios a la derecha (arriba) */
-    .services { list-style:none; padding:0; margin:0; border:1px solid #eee; border-radius:10px; overflow:hidden; }
-    .services li { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px dashed #eee; font-size:16px; background:#fff; }
+    .services { list-style:none; padding:0; margin:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+    .services li { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px dashed var(--line); font-size:16px; background:#fff; }
     .services li:last-child{ border-bottom:none; }
-    .tag-price { color:#111; font-weight:700; font-size:14px; margin-left:20px; }
+    .tag-price { color:#111; font-weight:700; font-size:14px; margin-left:20px; opacity:.95; }
 
     /* Inputs y layout form */
     input, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; background:#fff; }
@@ -94,8 +95,8 @@
 
     <h2>📋 Servicios (precios orientativos)</h2>
     <ul class="services">
-      <li><span>✅ Porte local (ayuda a pie de calle)</span><span class="tag-price">desde 35 €</span></li>
-      <li><span>✅ Porte + Carga y Descarga (1 peón incluido)</span><span class="tag-price">desde 60 €</span></li>
+      <li><span>✅ Porte (solo transporte, ayuda a pie de calle)</span><span class="tag-price">desde 35 €</span></li>
+      <li><span>✅ Porte con carga y descarga</span><span class="tag-price">desde 60 €</span></li>
       <li><span>✅ Mudanza pequeña</span><span class="tag-price">desde 90 €</span></li>
       <li><span>✅ Vaciado de piso</span><span class="tag-price">desde 150 €</span></li>
       <li><span>✅ Vaciado de nave</span><span class="tag-price">desde 180 €</span></li>
@@ -219,22 +220,13 @@
         </label>
       </div>
 
-      <!-- ✅ Servicios en el formulario (SIN precios visibles) -->
-      <label class="check">
-        <input type="checkbox" class="option servicio" data-key="porte" data-price="35">
-        Porte local (ayuda a pie de calle incluida)
-      </label>
-      <label class="check">
-        <input type="checkbox" class="option servicio" data-key="porteCarga" data-price="60">
-        Porte + Carga y Descarga (1 peón incluido)
-      </label>
-      <label class="check">
-        <input type="checkbox" class="option servicio" data-key="mudanza" data-price="90">
-        Mudanza pequeña
-      </label>
-      <label class="check"><input type="checkbox" class="option" data-key="vaciadoPiso" data-price="150"> Vaciado de piso</label>
-      <label class="check"><input type="checkbox" class="option" data-key="vaciadoNave" data-price="180"> Vaciado de nave</label>
-      <label class="check"><input type="checkbox" class="option" data-key="pintura" data-price="0"> Pintura o impermeabilización</label>
+      <!-- ✅ Opciones del formulario SIN precios al lado -->
+      <label class="check"><input type="checkbox" class="option" data-name="Porte (solo transporte)" data-price="35" id="optPorte"> Porte (solo transporte, ayuda a pie de calle)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Porte con carga y descarga" data-price="60" id="optPorteCD"> Porte con carga y descarga</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="90" id="optMudanza"> Mudanza pequeña</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150" id="optVaciadoPiso"> Vaciado de piso</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180" id="optVaciadoNave"> Vaciado de nave</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización</label>
 
       <h3>📦 Objetos</h3>
       <div class="grid-3">
@@ -368,20 +360,6 @@ function initMap() {
   // Recalcular precio al cambiar opciones
   document.querySelectorAll('.option').forEach(op => op.addEventListener('change', actualizarPrecio));
 
-  // Exclusión: porte vs porteCarga vs mudanza
-  document.querySelectorAll('.option.servicio').forEach(cb=>{
-    cb.addEventListener('change', ()=>{
-      if (!cb.checked) return;
-      const key = cb.dataset.key;
-      const excl = ['porte','porteCarga','mudanza'].filter(k=>k!==key);
-      excl.forEach(k=>{
-        const other = document.querySelector(`.option.servicio[data-key="${k}"]`);
-        if (other) other.checked = false;
-      });
-      actualizarPrecio();
-    });
-  });
-
   // Recalcular peso si cambian cantidades o peso manual
   ["armarios","cajas","bultos","sofas","camaMatrimonio","camaIndividual","pesoManual"].forEach(id=>{
     const el = document.getElementById(id);
@@ -469,7 +447,8 @@ function calcularPeso() {
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
 
-function recargoPorPeso(peso){
+function recargoPorPeso(peso, aplicaPeso){
+  if (!aplicaPeso) return 0;          // Porte solo transporte no suma por peso
   if (peso <= 200) return 0;
   if (peso <= 500) return 20;
   if (peso <= 800) return 40;
@@ -477,18 +456,20 @@ function recargoPorPeso(peso){
 }
 
 function actualizarPrecio() {
-  // Determinar servicio principal elegido
-  const porte = document.querySelector('.option.servicio[data-key="porte"]')?.checked || false;
-  const porteCarga = document.querySelector('.option.servicio[data-key="porteCarga"]')?.checked || false;
-  const mudanza = document.querySelector('.option.servicio[data-key="mudanza"]')?.checked || false;
+  // Qué servicios han marcado
+  const isPorteSolo = document.getElementById('optPorte')?.checked || false;
+  const isPorteCD   = document.getElementById('optPorteCD')?.checked || false;
+  const isMudanza   = document.getElementById('optMudanza')?.checked || false;
+  const isVaciadoP  = document.getElementById('optVaciadoPiso')?.checked || false;
+  const isVaciadoN  = document.getElementById('optVaciadoNave')?.checked || false;
 
-  // Sumar base de todos los seleccionados (vaciados, etc. pueden sumarse)
+  // Base por opciones (sin mostrar precios en el formulario)
   let base = 0;
   document.querySelectorAll('.option').forEach(op => {
     if (op.checked) base += parseFloat(op.dataset.price) || 0;
   });
 
-  // Tarifa km según si A y B están dentro del círculo
+  // Tarifa km
   let kmRate = 1.2; // fuera
   let ambasDentro = false;
   if (originMarker && destinationMarker) {
@@ -497,23 +478,29 @@ function actualizarPrecio() {
     ambasDentro = (dentroA && dentroB);
     if (ambasDentro) kmRate = 0.9;
   }
-
   let kmCost = 0;
   if (window.distanciaKm > 0) kmCost = window.distanciaKm * kmRate;
 
-  // Peso y peón solo para: Porte+Carga y Descarga o Mudanza
+  // Peso
   const peso = calcularPeso();
-  let pesoCost = 0;
+
+  // El recargo por peso SOLO aplica si hay servicios con carga/descarga
+  const aplicaPeso = (isPorteCD || isMudanza || isVaciadoP || isVaciadoN);
+  const pesoCost = recargoPorPeso(peso, aplicaPeso);
+
+  // Peón automático: solo cuando aplicaPeso = true
   let peonAuto = 0;
-  if (porteCarga || mudanza) {
-    pesoCost = recargoPorPeso(peso);
-    if (peso >= 400) peonAuto = 25; // peón adicional recomendado por peso alto
+  if (aplicaPeso) {
+    if (peso >= 700) peonAuto = 50;       // 2 peones
+    else if (peso >= 400) peonAuto = 25;  // 1 peón
   }
 
   let total = base + kmCost + pesoCost + peonAuto;
 
-  // Mínimo en Sevilla capital SOLO para porte simple
-  if (porte && ambasDentro && total < 35) total = 35;
+  // Mínimo solo para Porte (solo transporte) dentro de Sevilla
+  if (isPorteSolo && !isPorteCD && !isMudanza && !isVaciadoP && !isVaciadoN && ambasDentro && total < 35) {
+    total = 35;
+  }
 
   // Pintar UI
   document.getElementById("pesoTotal").textContent = `Peso estimado: ${peso} kg`;
@@ -522,9 +509,9 @@ function actualizarPrecio() {
   const desglose = [
     `Base servicios: ${base.toFixed(2)} €`,
     `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
-    (porteCarga || mudanza) ? `Recargo por peso: ${pesoCost.toFixed(2)} €` : `Recargo por peso: 0.00 € (porte simple)`,
-    (porteCarga || mudanza) && peonAuto ? `Peón recomendado por peso: ${peonAuto.toFixed(2)} €` : null,
-    (porte && ambasDentro) ? `Mínimo Sevilla capital aplicado si procede` : null
+    `Recargo por peso: ${pesoCost.toFixed(2)} €`,
+    peonAuto ? `Peón automático: ${peonAuto.toFixed(2)} €` : null,
+    (isPorteSolo && ambasDentro) ? `Mínimo Sevilla capital aplicado si procede` : null
   ].filter(Boolean).join(" · ");
 
   document.getElementById("desglose").textContent = desglose;
