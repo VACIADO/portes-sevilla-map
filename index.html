@@ -18,14 +18,12 @@
     .container { max-width: 900px; width: 95%; margin: 18px auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
     h1, h2 { text-align:center; margin: 10px 0 12px; }
     p { line-height: 1.5; }
-
-    /* Lista de servicios con precio alineado al extremo derecho */
-    .services { list-style:none; padding:0; margin:0; border:1px solid #eee; border-radius:12px; overflow:hidden; }
-    .services li { display:flex; gap:8px; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px dashed #eee; }
-    .services li:last-child { border-bottom:none; }
-    .service-title { display:flex; align-items:center; gap:8px; }
-    .service-price { margin-left:auto; color:#007BFF; font-weight:700; font-size:14px; min-width:110px; text-align:right; }
-
+    /* Lista de servicios con precios a la derecha (arriba) */
+    .services { list-style:none; padding:0; margin:0; border:1px solid #eee; border-radius:10px; overflow:hidden; }
+    .services li { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px dashed #eee; font-size:16px; background:#fff; }
+    .services li:last-child{ border-bottom:none; }
+    .tag-price { color:#007BFF; font-weight:700; font-size:14px; margin-left:20px; }
+    /* Inputs y layout form */
     input, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; background:#fff; }
     label { display:block; margin-bottom: 10px; font-size:15px; }
     .check { display:flex; align-items:center; gap:10px; margin:6px 0; }
@@ -46,7 +44,6 @@
     .aviso span { color:#0e8f3a; }
     .banner { background:#ffe9b3; padding:16px; border-radius:10px; margin:18px 0; text-align:center; font-size:18px; font-weight:bold; color:#4b4b4b; border:1px dashed #f2c66d; }
     .banner span { color:#c0392b; }
-
     .cards { display:grid; grid-template-columns: 1fr; gap:14px; margin: 12px 0 6px; }
     .card { border:1px solid #eee; border-radius:12px; overflow:hidden; background:#fff; display:grid; grid-template-columns: 110px 1fr; gap:12px; align-items:center; }
     .card img { width:110px; height:100%; object-fit:cover; display:block; }
@@ -54,7 +51,6 @@
     .card-title { font-weight:700; margin:0 0 6px; }
     .card-text { margin:0; color:#444; font-size:14px; }
     .badge { display:inline-block; background:#eaf8ec; color:#0e8f3a; border:1px solid #cdeed2; padding:4px 8px; border-radius:999px; font-size:12px; margin-top:6px;}
-
     .cta-inline { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
     .muted { color:#777; font-size:14px; text-align:center; margin:6px 0 0; }
     .desglose { font-size:13px; color:#555; text-align:center; margin:6px 0 0; }
@@ -96,38 +92,35 @@
 
     <h2>📋 Servicios (precios orientativos)</h2>
     <ul class="services">
-      <li>
-        <div class="service-title">✅ Portes económicos (solo transporte / ayuda a pie de calle)</div>
-        <span class="service-price">desde 35 €</span>
-      </li>
-      <li>
-        <div class="service-title">✅ Porte + carga y descarga</div>
-        <span class="service-price">desde 60 €</span>
-      </li>
-      <li>
-        <div class="service-title">✅ Mudanza pequeña (con peón)</div>
-        <span class="service-price">desde 90 €</span>
-      </li>
-      <li>
-        <div class="service-title">✅ Vaciado de piso (60–90 m²)</div>
-        <span class="service-price">desde 150 €</span>
-      </li>
-      <li>
-        <div class="service-title">✅ Vaciado de nave</div>
-        <span class="service-price">desde 180 €</span>
-      </li>
-      <li>
-        <div class="service-title">✅ Pintura e impermeabilización</div>
-        <span class="service-price">según m²</span>
-      </li>
+      <li><span>✅ Porte local (ayuda a pie de calle)</span><span class="tag-price">desde 35 €</span></li>
+      <li><span>✅ Carga y descarga adicional</span><span class="tag-price">+25 €</span></li>
+      <li><span>✅ Mudanza pequeña</span><span class="tag-price">desde 90 €</span></li>
+      <li><span>✅ Vaciado de piso</span><span class="tag-price">desde 150 €</span></li>
+      <li><span>✅ Vaciado de nave</span><span class="tag-price">desde 180 €</span></li>
+      <li><span>✅ Pintura / Impermeabilización</span><span class="tag-price">pide presupuesto</span></li>
     </ul>
 
     <h2>🎨 Pintura e Impermeabilización</h2>
     <div class="cards">
-      <!-- Imágenes embebidas (siempre cargan) -->
+      <!-- IMÁGENES SVG que siempre cargan -->
       <div class="card">
         <img alt="Impermeabilización de azotea"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%23007BFF'/><stop offset='100%' stop-color='%2346A2FF'/></linearGradient></defs><rect width='100%25' height='100%25' fill='url(%23g)'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>IMPERMEABILIZACIÓN</text><text x='16' y='64'>DE AZOTEA</text></g><g stroke='%23fff' stroke-width='4' fill='none'><path d='M30,150 L270,150'/><path d='M50,80 L150,40 L250,80 L250,150 L50,150 Z'/><path d='M90,150 C110,130 130,130 150,150 C170,170 190,170 210,150'/></g></svg>"/>
+             src="data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+  <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+    <stop offset='0%' stop-color='%23007BFF'/><stop offset='100%' stop-color='%2346A2FF'/>
+  </linearGradient></defs>
+  <rect width='100%%' height='100%%' fill='url(%23g)'/>
+  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
+    <text x='16' y='36'>IMPERMEABILIZACIÓN</text>
+    <text x='16' y='64'>DE AZOTEA</text>
+  </g>
+  <g stroke='%23fff' stroke-width='4' fill='none'>
+    <path d='M30,150 L270,150'/>
+    <path d='M50,80 L150,40 L250,80 L250,150 L50,150 Z'/>
+    <path d='M90,150 C110,130 130,130 150,150 C170,170 190,170 210,150'/>
+  </g>
+</svg>"/>
         <div class="card-body">
           <p class="card-title">Impermeabilización de Azoteas</p>
           <p class="card-text">Sellado de juntas, lámina líquida y reparaciones. Trabajo garantizado.</p>
@@ -136,7 +129,23 @@
       </div>
       <div class="card">
         <img alt="Pintura de vivienda"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%23f39c12'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>PINTURA</text><text x='16' y='64'>DE VIVIENDA</text></g><g stroke='%23fff' stroke-width='5' fill='none'><rect x='180' y='40' width='80' height='80' rx='6'/><path d='M40,160 L260,160'/><path d='M60,120 L140,120'/></g><g fill='%23fff'><rect x='60' y='90' width='16' height='46' rx='3'/><rect x='54' y='136' width='28' height='10' rx='3'/></g></svg>"/>
+             src="data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+  <rect width='100%%' height='100%%' fill='%23f39c12'/>
+  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
+    <text x='16' y='36'>PINTURA</text>
+    <text x='16' y='64'>DE VIVIENDA</text>
+  </g>
+  <g stroke='%23fff' stroke-width='5' fill='none'>
+    <rect x='180' y='40' width='80' height='80' rx='6'/>
+    <path d='M40,160 L260,160'/>
+    <path d='M60,120 L140,120'/>
+  </g>
+  <g fill='%23fff'>
+    <rect x='60' y='90' width='16' height='46' rx='3'/>
+    <rect x='54' y='136' width='28' height='10' rx='3'/>
+  </g>
+</svg>"/>
         <div class="card-body">
           <p class="card-title">Pintura de Viviendas</p>
           <p class="card-text">Pisos, trasteros y naves. Acabado limpio y rápido.</p>
@@ -145,7 +154,19 @@
       </div>
       <div class="card">
         <img alt="Pintura de naves y suelos epoxi"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%2327ae60'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>PINTURA DE NAVE</text><text x='16' y='64'>SUELO EPOXI</text></g><g stroke='%23fff' stroke-width='4' fill='none'><rect x='30' y='90' width='240' height='70' rx='4'/><path d='M30,120 L270,120'/><path d='M60,160 L120,100 L180,160 L240,100'/></g></svg>"/>
+             src="data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+  <rect width='100%%' height='100%%' fill='%2327ae60'/>
+  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
+    <text x='16' y='36'>PINTURA DE NAVE</text>
+    <text x='16' y='64'>SUELO EPOXI</text>
+  </g>
+  <g stroke='%23fff' stroke-width='4' fill='none'>
+    <rect x='30' y='90' width='240' height='70' rx='4'/>
+    <path d='M30,120 L270,120'/>
+    <path d='M60,160 L120,100 L180,160 L240,100'/>
+  </g>
+</svg>"/>
         <div class="card-body">
           <p class="card-title">Pintura de Naves</p>
           <p class="card-text">Suelos epoxi, paredes y techos. Protección y estética.</p>
@@ -154,7 +175,19 @@
       </div>
       <div class="card">
         <img alt="Sellado y humedades"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='100%25' height='100%25' fill='%239b59b6'/><g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'><text x='16' y='36'>SELLADO</text><text x='16' y='64'>Y HUMEDADES</text></g><g stroke='%23fff' stroke-width='4' fill='none'><path d='M40,150 C80,110 120,190 160,150 C200,110 240,190 260,150'/><circle cx='220' cy='110' r='14'/><path d='M220,96 L220,70'/></g></svg>"/>
+             src="data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+  <rect width='100%%' height='100%%' fill='%239b59b6'/>
+  <g fill='%23fff' font-family='Arial' font-size='18' font-weight='700'>
+    <text x='16' y='36'>SELLADO</text>
+    <text x='16' y='64'>Y HUMEDADES</text>
+  </g>
+  <g stroke='%23fff' stroke-width='4' fill='none'>
+    <path d='M40,150 C80,110 120,190 160,150 C200,110 240,190 260,150'/>
+    <circle cx='220' cy='110' r='14'/>
+    <path d='M220,96 L220,70'/>
+  </g>
+</svg>"/>
         <div class="card-body">
           <p class="card-title">Sellado y Humedades</p>
           <p class="card-text">Tratamiento de filtraciones y grietas. Soluciones duraderas.</p>
@@ -184,10 +217,10 @@
         </label>
       </div>
 
-      <!-- En el formulario NO hay precios visibles -->
+      <!-- ✅ En el formulario YA NO mostramos precios junto a cada servicio -->
       <label class="check"><input type="checkbox" class="option" data-name="Porte local (ayuda pie de calle)" data-price="35"> Porte local (ayuda a pie de calle incluida)</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Porte + carga y descarga" data-price="60"> Porte + carga y descarga</label>
-      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña (con peón)" data-price="90"> Mudanza pequeña (con peón)</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Carga y descarga adicional" data-price="25"> Carga y descarga adicional</label>
+      <label class="check"><input type="checkbox" class="option" data-name="Mudanza pequeña" data-price="90"> Mudanza pequeña</label>
       <label class="check"><input type="checkbox" class="option" data-name="Vaciado de piso" data-price="150"> Vaciado de piso</label>
       <label class="check"><input type="checkbox" class="option" data-name="Vaciado de nave" data-price="180"> Vaciado de nave</label>
       <label class="check"><input type="checkbox" class="option" data-name="Pintura/impermeabilización" data-price="0"> Pintura o impermeabilización</label>
@@ -441,14 +474,14 @@ function actualizarPrecio() {
   const peso = calcularPeso();
   const pesoCost = recargoPorPeso(peso);
 
-  // Peón automático si NO hay carga/descarga marcada y el peso es alto
-  const tieneCargaDesc = Array.from(document.querySelectorAll('.option')).some(op => op.checked && (op.dataset.name||'').toLowerCase().includes('carga y descarga'));
+  // Peón automático si peso alto y NO marcaron "Carga y descarga adicional"
+  const tieneCargaDesc = Array.from(document.querySelectorAll('.option')).some(op => op.checked && (op.dataset.name||'').toLowerCase().includes('carga y descarga adicional'));
   let peonAuto = 0;
   if (!tieneCargaDesc && peso >= 400) peonAuto = 25;
 
   let total = base + kmCost + pesoCost + peonAuto;
 
-  // Mínimo en Sevilla capital
+  // Mínimo en Sevilla capital (porte simple)
   if (ambasDentro && total < 35) total = 35;
 
   // Pintar UI
@@ -457,7 +490,7 @@ function actualizarPrecio() {
 
   const desglose = [
     `Base servicios: ${base.toFixed(2)} €`,
-    window.distanciaKm ? `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €` : null,
+    `Km (${kmRate.toFixed(1)} €/km): ${kmCost.toFixed(2)} €`,
     `Recargo por peso: ${pesoCost.toFixed(2)} €`,
     peonAuto ? `Peón recomendado por peso: ${peonAuto.toFixed(2)} €` : null,
     ambasDentro ? `Mínimo Sevilla capital aplicado si procede` : null
