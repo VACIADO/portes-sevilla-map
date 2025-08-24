@@ -33,15 +33,13 @@
     .check input[type="checkbox"]{ width:18px; height:18px; }
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 
-    /* ✅ Objetos en 2 columnas SIEMPRE (móvil y escritorio) */
+    /* ✅ Objetos en 2 columnas fijas (móvil y escritorio) */
     .grid-obj {
       display:grid;
       grid-template-columns: repeat(2,1fr);
       gap:12px;
     }
-    .grid-obj label, .grid-2 label {
-      background:#fafafa; border:1px solid #eee; border-radius:10px; padding:10px;
-    }
+    .grid-obj label, .grid-2 label { background:#fafafa; border:1px solid #eee; border-radius:10px; padding:10px; }
 
     button { background:var(--primary); color:#fff; padding:12px 16px; border:none; border-radius:8px; cursor:pointer; font-size:16px; width:100%; transition: filter .2s; }
     button:hover { filter:brightness(.95); }
@@ -68,7 +66,7 @@
     .foot-col a:hover { text-decoration:underline; }
     .foot-cta { display:flex; gap:10px; flex-wrap:wrap; }
     .foot-cta a { background:#25D366; color:#0d1b2a; padding:10px 14px; border-radius:8px; font-weight:700; text-decoration:none; }
-    .copy { text-align:center; font-size:12px; color:#bcd1ff; margin-top:6px; }
+    .copy { text-align:center; font-size:12px; color:#bcd1ff; }
 
     /* Modal */
     #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
@@ -238,7 +236,7 @@ function initMap() {
   });
 
   // Click en mapa: A -> B -> reset
-  map.addEventListener && map.addListener("click", (e) => {
+  map.addListener("click", (e) => {
     if (!originMarker) {
       originMarker = new google.maps.Marker({ position: e.latLng, map, label: "A" });
       geocodePosition(e.latLng, "origen");
@@ -355,19 +353,14 @@ function resetRuta(){
 }
 
 // -------------------- LÓGICA DE PESO / PEONES / COSTES --------------------
-
-// Peso estimado a partir de los campos (si no hay peso manual)
 function calcularPeso() {
   const n = id => parseInt(document.getElementById(id)?.value) || 0;
   const manual = parseInt(document.getElementById('pesoManual')?.value) || 0;
   if (manual > 0) return manual;
-  // Pesos estimados por unidad
   return n('armarios')*60 + n('cajas')*15 + n('bultos')*20 + n('sofas')*50 + n('camaMatrimonio')*80 + n('camaIndividual')*50;
 }
 
-// Umbrales de peso "incluido" (sin recargo de combustible/manejo), según zona y servicio
 function getPesoIncluido(ambasDentro, tipo){
-  // tipo: 'porteSolo' | 'porteCD' | 'mudanza' | 'vaciado'
   if (tipo === 'porteSolo')   return ambasDentro ? 350 : 250;
   if (tipo === 'porteCD')     return ambasDentro ? 250 : 200;
   if (tipo === 'mudanza')     return ambasDentro ? 200 : 150;
@@ -375,38 +368,29 @@ function getPesoIncluido(ambasDentro, tipo){
   return ambasDentro ? 250 : 200;
 }
 
-// Incremento €/km por combustible SOLO si (peso > incluido)
 function kmRateExtraPorExceso(excesoKg){
   if (excesoKg <= 0) return 0;
   if (excesoKg <= 200) return 0.10;
   if (excesoKg <= 400) return 0.20;
   return 0.35;
 }
-
-// Extra fijo por combustible SOLO si (peso > incluido)
 function extraFijoPorExceso(excesoKg){
   if (excesoKg <= 0) return 0;
   if (excesoKg <= 300) return 5;
   if (excesoKg <= 600) return 12;
   return 20;
 }
-
-// Recargo de MANEJO por peso SOLO si (peso > incluido) y el servicio requiere manejo
 function recargoManejoPorExceso(excesoKg){
   if (excesoKg <= 0) return 0;
   if (excesoKg <= 300) return 20;
   if (excesoKg <= 600) return 40;
   return 60;
 }
-
-// Estimación de tiempo de manejo (carga+descarga) en minutos
 function estimarMinutosManejo(){
   const g = id => parseInt(document.getElementById(id)?.value) || 0;
   const min = g('cajas')*3 + g('bultos')*4 + g('armarios')*10 + g('sofas')*8 + g('camaMatrimonio')*12 + g('camaIndividual')*10;
   return Math.max(min, (min>0 ? 15 : 0));
 }
-
-// Número de peones recomendados si hay manejo
 function peonesRecomendados(peso){
   const g = id => parseInt(document.getElementById(id)?.value) || 0;
   const voluminosos = g('sofas') + g('camaMatrimonio') + g('camaIndividual') + g('armarios');
@@ -415,7 +399,6 @@ function peonesRecomendados(peso){
 }
 
 function actualizarPrecio() {
-  // Servicios seleccionados
   const sel = Array.from(document.querySelectorAll('.option'))
     .filter(op => op.checked)
     .map(op => (op.dataset.name||'').toLowerCase());
@@ -425,12 +408,10 @@ function actualizarPrecio() {
   const isMudanza     = sel.includes('mudanza pequeña');
   const isVaciado     = sel.includes('vaciado de piso') || sel.includes('vaciado de nave');
 
-  // Base servicios
   let base = 0;
   document.querySelectorAll('.option').forEach(op => { if (op.checked) base += parseFloat(op.dataset.price)||0; });
 
-  // Zona (tarifa por km base)
-  let kmRateBase = 1.2; // fuera de Sevilla
+  let kmRateBase = 1.2;
   let ambasDentro = false;
   if (originMarker && destinationMarker) {
     const dentroA = insideSevilla(originMarker.getPosition());
@@ -442,45 +423,37 @@ function actualizarPrecio() {
   const km = Math.max(0, window.distanciaKm || 0);
   const peso = calcularPeso();
 
-  // Determinar tipo principal para umbral
   let tipo = 'porteSolo';
   if (isMudanza) tipo = 'mudanza';
   else if (isVaciado) tipo = 'vaciado';
   else if (isPorteCD) tipo = 'porteCD';
   else if (isPorteSolo) tipo = 'porteSolo';
 
-  // Peso incluido sin recargo
   const pesoIncluido = getPesoIncluido(ambasDentro, tipo);
   const excesoKg = Math.max(0, peso - pesoIncluido);
 
-  // Ajustes por combustible (aplican también en porte solo) SOLO si hay exceso
   const kmExtra = kmRateExtraPorExceso(excesoKg);
   const fijoComb = extraFijoPorExceso(excesoKg);
 
-  // Coste por km total
   const kmRate = kmRateBase + kmExtra;
   const kmCost = km * kmRate;
 
-  // Manejo: solo en porte+CyD, mudanza o vaciado
   const manejoRequerido = (isPorteCD || isMudanza || isVaciado);
   let manejoPeso = 0, peones = 0, minManejo = 0, costePeones = 0;
 
   if (manejoRequerido){
-    manejoPeso = recargoManejoPorExceso(excesoKg); // por exceso
+    manejoPeso = recargoManejoPorExceso(excesoKg);
     minManejo = estimarMinutosManejo();
     peones = peonesRecomendados(peso);
-    const tarifaPeonHora = 18; // €/h por peón
+    const tarifaPeonHora = 18;
     const horas = minManejo / 60;
     costePeones = peones * tarifaPeonHora * horas;
   }
 
-  // Total
   let total = base + kmCost + fijoComb + manejoPeso + costePeones;
 
-  // Mínimo en Sevilla capital
   if (ambasDentro && total < 35) total = 35;
 
-  // UI
   const pesoEl = document.getElementById("pesoTotal");
   if (pesoEl) pesoEl.textContent = `Peso estimado: ${peso} kg`;
   const precioEl = document.getElementById("precioTotal");
@@ -543,8 +516,11 @@ function cerrarModal(){ const m=document.getElementById('modal'); if(!m) return;
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarModal(); });
 document.addEventListener('click', e=>{ const m=document.getElementById('modal'); if(!m||m.style.display==='none') return; if(e.target===m) cerrarModal(); });
 
-// Recalcular al cargar por si hay valores por defecto
+// Recalcular una vez cargado el DOM
 document.addEventListener('DOMContentLoaded', actualizarPrecio);
+
+// ✅ Asegurar que Google encuentre el callback
+window.initMap = initMap;
 </script>
 
   <!-- Google Maps API (incluye geometry para el círculo y la distancia) -->
